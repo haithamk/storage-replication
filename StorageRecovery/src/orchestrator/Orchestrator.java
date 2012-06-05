@@ -12,12 +12,7 @@ import shared.TableInfo;
 public class Orchestrator {
 	
 	
-	//Used to keep track of the nodes in the system
-	private LinkedList<NodeInfo> nodes_details;
-	//The current active partition manager
-	private NodeInfo current_pm;
-	
-	private LinkedList<TableInfo> tables_list;
+
 	
 	
 	private ServerSocket commSocket;
@@ -66,20 +61,27 @@ public class Orchestrator {
 	
 	
 	
-	
-	
-	//***************************************************************************
-	//***************************************************************************
-	//***************************************************************************
-	//***************************************************************************
-	
-	
 	public String getActivePMAddress(){
 		return "";		
 	}
 	
 	
 	
+	//***************************************************************************
+	//***************************************************************************
+	//***************************************************************************
+	//***************************************************************************
+	
+	// OLD METHODS, IGNORE
+	
+	
+	
+	//Used to keep track of the nodes in the system
+	private LinkedList<NodeInfo> nodes_details;
+	//The current active partition manager
+	private NodeInfo current_pm;
+	
+	private LinkedList<TableInfo> tables_list;
 	
 	
 	
