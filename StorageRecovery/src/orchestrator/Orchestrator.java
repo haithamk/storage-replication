@@ -5,6 +5,8 @@ import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import shared.NodeAddress;
 import shared.TableInfo;
@@ -14,7 +16,7 @@ public class Orchestrator {
 	
 
 	
-	
+	private ExecutorService pool;
 	private ServerSocket commSocket;
 	
 	
@@ -27,9 +29,13 @@ public class Orchestrator {
 		
 		
 		String port = "";
+		String pool_size = "";
 		
 		try
 		{
+			pool = Executors.newCachedThreadPool();
+			// TODO fixed size or dynamic ?
+			//pool = Executors.newFixedThreadPool(Integer.parseInt(pool_size)); 
 			commSocket = new ServerSocket(Integer.parseInt(port));
 		}
 		catch(IOException e)
@@ -50,7 +56,7 @@ public class Orchestrator {
 		while(true){
 			try {
 				socket = commSocket.accept();
-				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+				pool.execute(new MessageHandler(socket));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
