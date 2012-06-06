@@ -9,16 +9,16 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import shared.Message;
-import shared.Message.MessageType;
+import messages.PMAddressMsg;
 
-public class MessageHandler implements Runnable {
+
+public class OrchMessageHandler implements Runnable {
 	
 	Socket socket;
 	OrchestratorDB orch_db;
 	JAXBContext jaxb_context;
 	
-	public MessageHandler(Socket socket, OrchestratorDB orch_db ){
+	public OrchMessageHandler(Socket socket, OrchestratorDB orch_db ){
 		this.socket = socket;
 		this.orch_db = orch_db;
 	}
@@ -27,8 +27,8 @@ public class MessageHandler implements Runnable {
 	public void run() {
 		try {
 			InputStreamReader in = new InputStreamReader(socket.getInputStream());
-			jaxb_context = JAXBContext.newInstance(Message.class);
-			Message msg = (Message) jaxb_context.createUnmarshaller().unmarshal(in);
+			jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);
+			PMAddressMsg msg = (PMAddressMsg) jaxb_context.createUnmarshaller().unmarshal(in);
 			switch (msg.type) {
 			case GET_PM_ADDRESS:
 				handleGetPMAddress();
@@ -51,10 +51,10 @@ public class MessageHandler implements Runnable {
 	 */
 	public void handleGetPMAddress(){
 		try {
-			Message reply = new Message();
+			PMAddressMsg reply = new PMAddressMsg();
 			String current_pm = orch_db.getActivePM();
 			
-			reply.type = MessageType.PM_ADDRESS;
+			reply.type = PMAddressMsg.MessageType.PM_ADDRESS;
 			reply.sender = "Orchestrator";
 			reply.msg_content = current_pm;
 			

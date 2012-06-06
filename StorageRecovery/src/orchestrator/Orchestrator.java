@@ -47,6 +47,29 @@ public class Orchestrator {
 	}
 	
 	
+	
+	/**
+	 * Starts the Orchestrator. 
+	 */
+	public void run(){
+		
+		Socket socket = null;
+		
+		while(true){
+			try {
+				socket = commSocket.accept();
+				//Execute method is NOT blocking function. The Job is saved and when
+				//There are available thread it will handle it.
+				pool.execute(new OrchMessageHandler(socket, orch_db));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	
+	
 	/**
 	 *  The method initializes the Data Base needed to operate properly
 	 * @param config_file The file to read configuration from
@@ -71,31 +94,6 @@ public class Orchestrator {
 		//TODO temporarily for testing proposes. 
 		orch_db.active_pm_address = "192.36.45.5:45";
 	}
-	
-	
-	
-	/**
-	 * Starts the Orchestrator. 
-	 */
-	public void run(){
-		
-		Socket socket = null;
-		
-		while(true){
-			try {
-				socket = commSocket.accept();
-				//Execute method is NOT blocking function. The Job is saved and when
-				//There are available thread it will handle it.
-				pool.execute(new MessageHandler(socket, orch_db));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	
-	
-	
 	
 	
 	
