@@ -28,7 +28,6 @@ public class PMMessageHandler implements Runnable {
 			//TODO check if the check sum is fine
 			
 			executeOperation(msg);
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

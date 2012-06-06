@@ -3,24 +3,17 @@ package partitionManager;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
-import orchestrator.OrchMessageHandler;
 
 import org.w3c.dom.Document;
 
-
-import shared.NodeAddress;
-import shared.TableInfo;
 
 public class PartitionManager {
 	
@@ -29,9 +22,9 @@ public class PartitionManager {
 	private ServerSocket commSocket;
 	
 	
-	public PartitionManager(String config_file){
+	public PartitionManager(String node_id, String config_file){
 		try{
-			initDB(config_file);
+			initDB(node_id, config_file);
 			
 			pool = Executors.newCachedThreadPool();
 			commSocket = new ServerSocket(pm_db.port);
@@ -63,7 +56,7 @@ public class PartitionManager {
 	
 	
 	
-	private void initDB(String config_file) throws Exception{
+	private void initDB(String node_id, String config_file) throws Exception{
 		pm_db = new PartitionManagerDB();
 		
 		//Loading XML document
@@ -75,7 +68,7 @@ public class PartitionManager {
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xpath = xpathFactory.newXPath();
 		
-		String port_str = xpath.compile("//port").evaluate(doc);
+		String port_str = xpath.compile("//partition-manager/node-info[@id =" + node_id + "]/port").evaluate(doc);
 
 		pm_db.port = Integer.parseInt(port_str);
 	}

@@ -9,7 +9,7 @@ public class PartitionManagerDB {
 
 	class Table{
 		
-		//TODO synchornize accesses to the table
+		//TODO synchronize accesses to the table
 		String table_name;
 		Map<String, String> table;
 		Set<String> authorized_users;
@@ -18,6 +18,9 @@ public class PartitionManagerDB {
 			table = new HashMap<String, String>();
 			authorized_users = new HashSet<String>();
 		}
+		
+		
+		
 		
 	}
 	
