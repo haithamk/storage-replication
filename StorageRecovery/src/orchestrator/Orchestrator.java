@@ -1,12 +1,18 @@
 package orchestrator;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
+
+import org.w3c.dom.Document;
 
 import shared.NodeAddress;
 import shared.TableInfo;
@@ -18,6 +24,7 @@ public class Orchestrator {
 	
 	private ExecutorService pool;
 	private ServerSocket commSocket;
+	OrchestratorDB orch_db;
 	
 	
 	/**
@@ -25,23 +32,44 @@ public class Orchestrator {
 	 * @param config_file the configuration file to initialize the Orchestrator parameters
 	 */
 	public Orchestrator(String config_file){
-		//TODO read configuration		
-		
-		
-		String port = "";
-		String pool_size = "";
-		
 		try
 		{
+			initDB(config_file);
 			pool = Executors.newCachedThreadPool();
 			// TODO fixed size or dynamic ?
 			//pool = Executors.newFixedThreadPool(Integer.parseInt(pool_size)); 
-			commSocket = new ServerSocket(Integer.parseInt(port));
+			commSocket = new ServerSocket(orch_db.port);
 		}
-		catch(IOException e)
+		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	
+	/**
+	 *  The method initializes the Data Base needed to operate properly
+	 * @param config_file The file to read configuration from
+	 * @throws Exception Exception in case an error
+	 */
+	private void initDB(String config_file) throws Exception{
+		orch_db = new OrchestratorDB();
+		
+		//Loading XML document
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		docFactory.setNamespaceAware(true);
+		DocumentBuilder builder = docFactory.newDocumentBuilder();
+		Document doc = builder.parse(config_file);
+		
+		XPathFactory xpathFactory = XPathFactory.newInstance();
+		XPath xpath = xpathFactory.newXPath();
+		
+		String port_str = xpath.compile("//port").evaluate(doc);
+
+		orch_db.port = Integer.parseInt(port_str);
+		
+		//TODO temporarily for testing proposes. 
+		orch_db.active_pm_address = "192.36.45.5:45";
 	}
 	
 	
@@ -56,20 +84,18 @@ public class Orchestrator {
 		while(true){
 			try {
 				socket = commSocket.accept();
-				pool.execute(new MessageHandler(socket));
+				//Execute method is NOT blocking function. The Job is saved and when
+				//There are available thread it will handle it.
+				pool.execute(new MessageHandler(socket, orch_db));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-			
 		}
 	}
 	
 	
 	
-	public String getActivePMAddress(){
-		return "";		
-	}
+	
 	
 	
 	
@@ -93,6 +119,10 @@ public class Orchestrator {
 	
 	public void recieveHeartBeat(NodeAddress from){
 		
+	}
+	
+	public String getActivePMAddress(){
+		return "";		
 	}
 	
 	
