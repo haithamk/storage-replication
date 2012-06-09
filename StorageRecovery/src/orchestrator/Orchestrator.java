@@ -31,10 +31,10 @@ public class Orchestrator {
 	 * Initialize the Orchestrator
 	 * @param config_file the configuration file to initialize the Orchestrator parameters
 	 */
-	public Orchestrator(String config_file){
+	public Orchestrator(String config_file, String id){
 		try
 		{
-			initDB(config_file);
+			orch_db = new OrchestratorDB(config_file, id);
 			pool = Executors.newCachedThreadPool();
 			// TODO fixed size or dynamic ?
 			//pool = Executors.newFixedThreadPool(Integer.parseInt(pool_size)); 
@@ -69,33 +69,7 @@ public class Orchestrator {
 	
 	
 	
-	
-	/**
-	 *  The method initializes the Data Base needed to operate properly
-	 * @param config_file The file to read configuration from
-	 * @throws Exception Exception in case an error
-	 */
-	private void initDB(String config_file) throws Exception{
-		orch_db = new OrchestratorDB();
 		
-		//Loading XML document
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		docFactory.setNamespaceAware(true);
-		DocumentBuilder builder = docFactory.newDocumentBuilder();
-		Document doc = builder.parse(config_file);
-		
-		XPathFactory xpathFactory = XPathFactory.newInstance();
-		XPath xpath = xpathFactory.newXPath();
-		
-		String port_str = xpath.compile("//port").evaluate(doc);
-
-		orch_db.port = Integer.parseInt(port_str);
-		
-		//TODO temporarily for testing proposes. 
-		orch_db.active_pm_address = "192.36.45.5:45";
-	}
-	
-	
 	
 	//***************************************************************************
 	//***************************************************************************

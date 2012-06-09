@@ -15,7 +15,7 @@ public class StorageRecoveryMain {
 		
 		
 		if(type.equals("Orchestrator")){
-			Orchestrator orch = new Orchestrator(config_file);
+			Orchestrator orch = new Orchestrator(config_file, node_id);
 			orch.run();
 		}else if(type.equals("PartitionManager")){
 			PartitionManager part_man = new PartitionManager(node_id, config_file);

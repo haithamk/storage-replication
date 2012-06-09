@@ -12,11 +12,16 @@ import javax.xml.bind.Marshaller;
 import messages.PMAddressMsg;
 
 
+/**
+ * Handles messages sent to the orchestrator
+ * @author Haitham
+ *
+ */
 public class OrchMessageHandler implements Runnable {
 	
-	Socket socket;
-	OrchestratorDB orch_db;
-	JAXBContext jaxb_context;
+	Socket socket;				//The received socket
+	OrchestratorDB orch_db;		//The data base of the Orchestrator
+	JAXBContext jaxb_context;	//JAXB object
 	
 	public OrchMessageHandler(Socket socket, OrchestratorDB orch_db ){
 		this.socket = socket;
