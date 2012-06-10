@@ -19,7 +19,7 @@ public class ClientOPMsg {
 	public String password;
 	
 	@XmlElement
-	public String tabel_name;
+	public String table_name;
 	
 	@XmlElement
 	public OperationType type;
