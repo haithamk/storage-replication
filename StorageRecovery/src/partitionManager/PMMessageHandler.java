@@ -36,16 +36,22 @@ public class PMMessageHandler implements Runnable {
 	
 	
 	public void executeOperation(ClientOPMsg msg){
+		String value;
 		switch (msg.type){
 		case CREATE_TABLE:
+			pm_db.createeTable(msg.table_name);
 			break;
 		case DROP_TABLE:
+			pm_db.dropTable(msg.table_name);
 			break;
 		case STORE:
+			pm_db.store(msg.table_name, msg.key, msg.value);
 			break;
 		case READ:
+			value = pm_db.read(msg.table_name, msg.key);
 			break;
 		case DELETE:
+			pm_db.delete(msg.table_name, msg.key);
 			break;
 		
 		default:
