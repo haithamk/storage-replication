@@ -1,7 +1,14 @@
 <config>
 	<Orchestrators>
-		<Orchestrator id="1">
+		<Orchestrator id="0">
+			<ip>localhost</ip>
 			<clients-port>43201</clients-port>
 		</Orchestrator>
 	</Orchestrators>
+	<PartitionManagers>
+		<PartitionManager id = "10">
+			<ip>localhost</ip>
+			<clients-port>43202</clients-port>
+		</PartitionManager>
+	</PartitionManagers>
 </config>

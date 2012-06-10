@@ -1,0 +1,1 @@
+Orchestrator: java -jar StorageRecoveryNode.jar Orchestrator 1 ../config.xml

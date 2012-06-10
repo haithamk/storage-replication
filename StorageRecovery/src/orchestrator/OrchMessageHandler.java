@@ -1,7 +1,6 @@
 package orchestrator;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
@@ -10,7 +9,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import shared.NoCloseInputStream;
-
 import messages.PMAddressMsg;
 
 
@@ -35,8 +33,14 @@ public class OrchMessageHandler implements Runnable {
 		try {
 			NoCloseInputStream in = new NoCloseInputStream(socket.getInputStream());
 			//InputStreamReader in = new InputStreamReader(socket.getInputStream());
-			jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);
+			jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);		
+			
+		//	DebugUtility.printSocket(socket);
+			
+			
 			PMAddressMsg msg = (PMAddressMsg) jaxb_context.createUnmarshaller().unmarshal(in);
+			
+			System.out.println("Recieved a message from: " + msg.sender);
 			switch (msg.type) {
 			case GET_PM_ADDRESS:
 				handleGetPMAddress();
@@ -73,6 +77,7 @@ public class OrchMessageHandler implements Runnable {
 			m.marshal( reply, out );
 			out.flush();
 			out.close();
+			socket.close();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
