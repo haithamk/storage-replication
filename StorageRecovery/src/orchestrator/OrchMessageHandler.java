@@ -9,6 +9,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import shared.NoCloseInputStream;
+
 import messages.PMAddressMsg;
 
 
@@ -31,7 +33,8 @@ public class OrchMessageHandler implements Runnable {
 	@Override
 	public void run() {
 		try {
-			InputStreamReader in = new InputStreamReader(socket.getInputStream());
+			NoCloseInputStream in = new NoCloseInputStream(socket.getInputStream());
+			//InputStreamReader in = new InputStreamReader(socket.getInputStream());
 			jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);
 			PMAddressMsg msg = (PMAddressMsg) jaxb_context.createUnmarshaller().unmarshal(in);
 			switch (msg.type) {
