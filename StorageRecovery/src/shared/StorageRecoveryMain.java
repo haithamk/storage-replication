@@ -15,6 +15,7 @@ public class StorageRecoveryMain {
 		
 		
 		if(type.equals("Orchestrator")){
+			//TODO change order
 			Orchestrator orch = new Orchestrator(config_file, node_id);
 			orch.run();
 		}else if(type.equals("PartitionManager")){
