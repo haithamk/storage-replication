@@ -1,10 +1,15 @@
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.net.Socket;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+
+import org.apache.commons.io.IOUtils;
+
+import debug.DebugUtility;
 
 import messages.PMAddressMsg;
 import messages.PMAddressMsg.MessageType;
@@ -20,11 +25,11 @@ public class Test {
 		int orch_port = 43201;
 		
 		Socket socket = null;
-		ObjectOutputStream out = null;
+		OutputStream out = null;
 		try{
 			socket = new Socket(orch_ip, orch_port);
-			socket.setSoTimeout(1000);
-			out = new ObjectOutputStream(socket.getOutputStream());
+			socket.setSoTimeout(60000);
+			out = socket.getOutputStream();
 			
 			
 			PMAddressMsg msg = new PMAddressMsg();
@@ -36,9 +41,14 @@ public class Test {
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			
-			m.marshal( msg, out );
 			
-			out.flush();
+			m.marshal( msg, out );
+			socket.shutdownOutput();
+			
+			PMAddressMsg reply = (PMAddressMsg) jaxb_context.createUnmarshaller().unmarshal(socket.getInputStream());
+
+			System.out.println(reply.msg_content);
+			socket.close();
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally
