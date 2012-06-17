@@ -1,18 +1,15 @@
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 
-import org.apache.commons.io.IOUtils;
-
-import debug.DebugUtility;
 
 import messages.PMAddressMsg;
-import messages.PMAddressMsg.MessageType;
+import messages.Message.MessageType;
 
 
 public class Test {
@@ -32,22 +29,33 @@ public class Test {
 			out = socket.getOutputStream();
 			
 			
-			PMAddressMsg msg = new PMAddressMsg();
-			msg.sender = "Client";
-			msg.type = MessageType.GET_PM_ADDRESS;
+			 PrintWriter pw = new PrintWriter(out, true);
+			 pw.println("GET_PM_ADDRESS");
+
+			
+//			PMAddressMsg msg = new PMAddressMsg();
+//			msg.sender = "Client";
+//			msg.type = MessageType.GET_PM_ADDRESS;
 			
 			JAXBContext jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);
 			
-			Marshaller m = jaxb_context.createMarshaller();
-			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			
-			
-			m.marshal( msg, out );
+//			Marshaller m = jaxb_context.createMarshaller();
+//			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);	
+//			m.marshal( msg, out );
 			socket.shutdownOutput();
 			
-			PMAddressMsg reply = (PMAddressMsg) jaxb_context.createUnmarshaller().unmarshal(socket.getInputStream());
+			BufferedReader inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			MessageType type = MessageType.valueOf(inputReader.readLine());
+			if(type != MessageType.PM_ADDRESS){
+				System.err.println("BAD REPLY");
+			}else{
+				PMAddressMsg reply = (PMAddressMsg) jaxb_context.createUnmarshaller().unmarshal(socket.getInputStream());
+				System.out.println(reply.msg_content);
+			}
+				
+			
 
-			System.out.println(reply.msg_content);
+		
 			socket.close();
 		}catch(Exception e){
 			e.printStackTrace();
