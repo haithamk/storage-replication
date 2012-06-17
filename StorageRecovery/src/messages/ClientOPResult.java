@@ -2,15 +2,15 @@ package messages;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class ClientOPReplyMsg {
-	public enum Result{
+public class ClientOPResult extends Message{
+	public enum Status{
 		SUCCESS,
 		FAIL,
 		NOT_AUTHORIZED
 	}
 	
 	@XmlElement
-	Result result;
+	public Status status;
 	
 	@XmlElement
 	public String vlaue;

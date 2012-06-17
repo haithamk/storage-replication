@@ -26,7 +26,7 @@ public class PartitionManagerDB {
 	public int port;
 	
 	
-	protected void createeTable(String table_name){
+	protected void createTable(String table_name){
 		Table table = new Table(table_name);
 		tables.put(table_name, table);
 	}

@@ -2,7 +2,7 @@ package messages;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class ClientOPMsg {
+public class ClientOPMsg extends Message{
 
 	public enum OperationType{
 		CREATE_TABLE,

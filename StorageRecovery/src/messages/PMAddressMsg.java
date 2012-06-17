@@ -4,22 +4,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class PMAddressMsg {
-	
-	
-	public enum MessageType{
-		GET_PM_ADDRESS,
-		PM_ADDRESS
-	}
-
-	
+public class PMAddressMsg extends Message{
 	
 	@XmlElement
-	public String sender;
+	public String msg_content;	
 	
-	@XmlElement
-	public MessageType type;
-	
-	@XmlElement
-	public String msg_content;
 }
