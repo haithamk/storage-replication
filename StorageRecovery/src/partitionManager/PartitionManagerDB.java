@@ -8,18 +8,7 @@ import java.util.Set;
 
 public class PartitionManagerDB {
 
-	class Table{
-		//TODO synchronize accesses to the table
-		String table_name;
-		Map<String, String> table;
-		Set<String> authorized_users;
-		
-		public Table(String table_name){
-			this.table_name = table_name;
-			table = new HashMap<String, String>();
-			authorized_users = new HashSet<String>();
-		}
-	}
+	
 	
 	
 	private Hashtable<String, Table> tables;
@@ -43,7 +32,10 @@ public class PartitionManagerDB {
 			return false;
 		}
 		
-		table.table.put(key, value);
+		table.lockRow(key);
+		table.store(key, value);
+		table.unlockRow(key);
+		
 		return true;		
 	}
 	
@@ -53,7 +45,11 @@ public class PartitionManagerDB {
 			return null;
 		}
 		
-		return table.table.get(key); 
+		table.lockRow(key);
+		String result =  table.read(key); 
+		table.unlockRow(key);
+		
+		return result;
 	}
 	
 	protected void delete(String table_name, String key){
@@ -62,7 +58,9 @@ public class PartitionManagerDB {
 			return;
 		}
 		
-		table.table.get(key); 
+		table.lockRow(key);
+		table.delete(key); 
+		table.unlockRow(key);
 	}
 	
 	
