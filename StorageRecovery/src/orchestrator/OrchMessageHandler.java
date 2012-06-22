@@ -11,6 +11,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import messages.PMAddressMsg;
 import messages.Message.MessageType;
 
@@ -22,10 +25,12 @@ import messages.Message.MessageType;
  */
 public class OrchMessageHandler implements Runnable {
 	
+	static final Logger logger = LoggerFactory.getLogger(OrchMessageHandler.class);
 	Socket socket;				//The received socket
 	OrchestratorDB orch_db;		//The data base of the Orchestrator
 	
 	public OrchMessageHandler(Socket socket, OrchestratorDB orch_db ){
+		logger.debug("New OrchMessageHandler created");
 		this.socket = socket;
 		this.orch_db = orch_db;
 	}
@@ -36,7 +41,8 @@ public class OrchMessageHandler implements Runnable {
 			
 			BufferedReader inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			MessageType type = MessageType.valueOf(inputReader.readLine());
-
+			logger.info("Handling message of type: {}", type);
+			
 			switch(type){
 			case GET_PM_ADDRESS:
 				handleGetPMAddress();
@@ -61,29 +67,33 @@ public class OrchMessageHandler implements Runnable {
 	public void handleGetPMAddress(){
 		try {
 			
-			JAXBContext jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);
-			
+			//Creating reply message
 			PMAddressMsg reply = new PMAddressMsg();
-			String current_pm = orch_db.getActivePM();
-			
+			String current_pm = orch_db.getActivePM();			
 			reply.msg_content = current_pm;
+			logger.debug("Reply message with address: {}", current_pm);
 			
+			//Creating marshller
+			JAXBContext jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			
+			//Sending message
+			logger.debug("Sending reply");
 			OutputStream out = socket.getOutputStream();
 			PrintWriter pw = new PrintWriter(out, true);
-			 pw.println("PM_ADDRESS");
+			pw.println("PM_ADDRESS");
 			 
 			m.marshal( reply, out );
 			out.flush();
 			out.close();
 			socket.close();
+			logger.info("Handling request completed successfully");
 			
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IO error occurred while handling message", e);
 		} catch (JAXBException e) {
-			e.printStackTrace();
+			logger.error("Jaxb error occurred while handling message", e);
 		}
 	}
 

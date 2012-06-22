@@ -6,11 +6,13 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class Orchestrator {
 	
-	
-
+	static final Logger logger = LoggerFactory.getLogger(Orchestrator.class);
 	
 	private ExecutorService pool;
 	private ServerSocket commSocket;
@@ -21,18 +23,18 @@ public class Orchestrator {
 	 * Initialize the Orchestrator
 	 * @param config_file the configuration file to initialize the Orchestrator parameters
 	 */
-	public Orchestrator(String config_file, String id){
+	public Orchestrator(String id, String config_file){
 		try
 		{
-			orch_db = new OrchestratorDB(config_file, id);
+			logger.info("Initalizing Orchestrator");
+			orch_db = new OrchestratorDB(id, config_file);
 			pool = Executors.newCachedThreadPool();
-			// TODO fixed size or dynamic ?
-			//pool = Executors.newFixedThreadPool(Integer.parseInt(pool_size)); 
 			commSocket = new ServerSocket(orch_db.port);
+			logger.info("Orchestrator initalized successfully");
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			logger.error("An error occurred while initalizing Orchestrator", e);
 		}
 	}
 	
@@ -43,16 +45,17 @@ public class Orchestrator {
 	 */
 	public void run(){
 		
-		Socket socket = null;
-		
+		logger.info("Starting the Orchestrator");
+		Socket socket = null;		
 		while(true){
 			try {
 				socket = commSocket.accept();
+				logger.debug("New socket recieved");
 				//Execute method is NOT blocking function. The Job is saved and when
 				//There are available thread it will handle it.
 				pool.execute(new OrchMessageHandler(socket, orch_db));
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("An error occurred while running Orchestrator", e);
 			}
 		}
 	}
