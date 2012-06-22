@@ -6,17 +6,10 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
-
-
-import orchestrator.Orchestrator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
+
+import utilities.HeartbeatSender;
 
 
 public class PartitionManager {
@@ -25,6 +18,7 @@ public class PartitionManager {
 	PartitionManagerDB pm_db;
 	private ExecutorService pool;
 	private ServerSocket commSocket;
+	private HeartbeatSender heartbeat_sender;
 	
 	
 	public PartitionManager(String node_id, String config_file){
@@ -33,6 +27,7 @@ public class PartitionManager {
 			pm_db = new PartitionManagerDB(node_id, config_file);
 			pool = Executors.newCachedThreadPool();
 			commSocket = new ServerSocket(pm_db.port);
+			heartbeat_sender = new HeartbeatSender(node_id, pm_db.heartbeat_rate, pm_db.orch_ip, pm_db.orch_port);
 			logger.info("PartitionManager({}) initalized successfully", node_id);
 		}catch(Exception e){
 			logger.error("An error occurred while initalizing PartitionManager(" + node_id + ")", e);
@@ -42,8 +37,10 @@ public class PartitionManager {
 	
 	
 	public void run(){
-		Socket socket = null;
 		
+		heartbeat_sender.start();
+		
+		Socket socket = null;		
 		logger.info("Starting the PartitionManager({})", pm_db.node_id);
 		while(true){
 			try {

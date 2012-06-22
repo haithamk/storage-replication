@@ -1,11 +1,7 @@
 package partitionManager;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -29,6 +25,10 @@ public class PartitionManagerDB {
 	
 	private Hashtable<String, Table> tables;	
 	public int port;
+	public String orch_ip;
+	public int orch_port;
+	public int heartbeat_rate;
+	
 	
 	public PartitionManagerDB(String node_id, String config_file) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
 		logger.info("Initalizing PartitionManagerDB({}) DB", node_id);
@@ -44,10 +44,21 @@ public class PartitionManagerDB {
 		XPath xpath = xpathFactory.newXPath();
 		
 		//Loading port
-		String port_str = xpath.compile("//partition-manager/node-info[@id =" + node_id + "]/port").evaluate(doc);
-		port = Integer.parseInt(port_str);
-		logger.info(" PartitionManagerDB({}) Port: {}", node_id, port_str);
-
+		String dummy_str = xpath.compile("//partition-manager/node-info[@id =" + node_id + "]/port").evaluate(doc);
+		port = Integer.parseInt(dummy_str);
+		logger.info(" PartitionManagerDB({}) Port: {}", node_id, port);
+		
+		//Loading Orchestrator address
+		orch_ip = xpath.compile("//Orchestrator/ip").evaluate(doc);
+		//Loading Orchestrator port
+		dummy_str = xpath.compile("//Orchestrator/port").evaluate(doc);
+		orch_port = Integer.parseInt(dummy_str);
+		logger.info("Orchestrator IP: {}, port: {}", orch_ip, orch_port);
+		
+		//Loading heartbeat rate
+		dummy_str = xpath.compile("//General/heartbeat-rate").evaluate(doc);
+		heartbeat_rate = Integer.parseInt(dummy_str);
+		logger.info("Heart beat rate: {}", heartbeat_rate);
 	}
 	
 	/**

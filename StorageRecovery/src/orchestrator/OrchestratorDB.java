@@ -34,7 +34,7 @@ public class OrchestratorDB {
 		XPath xpath = xpathFactory.newXPath();
 		
 		//Loading port
-		String port_str = xpath.compile("//Orchestrator[@id=1]/clients-port").evaluate(doc);
+		String port_str = xpath.compile("//Orchestrator[@id=" + id+ "]/port").evaluate(doc);
 		port = Integer.parseInt(port_str);
 		logger.info("Orchestrator Port: " + port_str);
 		
