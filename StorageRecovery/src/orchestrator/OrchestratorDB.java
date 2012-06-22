@@ -1,6 +1,7 @@
 package orchestrator;
 
 import java.io.IOException;
+import java.util.Hashtable;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,10 +17,18 @@ import org.xml.sax.SAXException;
 
 public class OrchestratorDB {
 	
+	class NodeInfo{
+		String id;
+		String address;
+		int port;
+		long last_heartbeat;
+	}
+	
+	
 	static final Logger logger = LoggerFactory.getLogger(OrchestratorDB.class);
 	public int port;
-	public String active_pm_address;
-	
+	public NodeInfo active_pm;
+	Hashtable<String, NodeInfo> nodes;
 	
 	
 	
@@ -39,16 +48,19 @@ public class OrchestratorDB {
 		logger.info("Orchestrator Port: " + port_str);
 		
 		//TODO temporarily for testing proposes. 
-		active_pm_address = "192.36.45.5:45";
+		active_pm = new NodeInfo();
+		active_pm.address = "192.36.45.5:45";
 		
+		
+		nodes = new Hashtable<String, NodeInfo>();
 	}
 	/**
 	 * Atomically return the active PM address
 	 */
 	public String getActivePM(){
 		String current_pm;
-		synchronized(active_pm_address){
-			current_pm = active_pm_address;
+		synchronized(nodes){
+			current_pm = active_pm.address;
 			logger.debug("getActivePM: {}", current_pm);
 		}
 		
@@ -59,10 +71,15 @@ public class OrchestratorDB {
 	 * Atomically set the active PM address
 	 */
 	public void setActivePM(String new_pm){
-		synchronized(active_pm_address){
-			active_pm_address = new_pm;
+		synchronized(nodes){
+			active_pm.address = new_pm;
 			logger.debug("setActivePM: {}", new_pm);
 		}
+	}
+	
+	
+	public void logHeartbeat(String id){
+		NodeInfo 
 	}
 	
 }

@@ -9,6 +9,8 @@ public class HeartBeatListener extends Thread {
 	
 	@Override
 	public void run(){
-		
+		while(true){
+			
+		}
 	}
 }
