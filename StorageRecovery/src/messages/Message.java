@@ -20,4 +20,8 @@ public abstract class Message {
 	
 	@XmlElement
 	public long time;
+	
+	public String getHeaders(){
+		return String.format("Source: %s\nDest: %s\nTime: %s" , source, dest, time);		
+	}
 }

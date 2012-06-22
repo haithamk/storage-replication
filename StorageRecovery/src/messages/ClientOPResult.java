@@ -3,14 +3,19 @@ package messages;
 import javax.xml.bind.annotation.XmlElement;
 
 public class ClientOPResult extends Message{
-	public enum Status{
+	public enum ClientOPStatus{
 		SUCCESS,
 		FAIL,
-		NOT_AUTHORIZED
+		NOT_AUTHORIZED,
+		TABLE_DOESNT_EXIST
+	}
+	
+	public ClientOPResult(){
+		status = ClientOPStatus.SUCCESS;
 	}
 	
 	@XmlElement
-	public Status status;
+	public ClientOPStatus status;
 	
 	@XmlElement
 	public String vlaue;

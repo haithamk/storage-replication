@@ -32,4 +32,10 @@ public class ClientOPMsg extends Message{
 	
 	@XmlElement
 	public String check_sum;
+	
+	
+	public String toString(){
+		return String.format("user name: %s\npassword: %s\ntable name: %s\ntype:%s\n key: %s\nvalue: %s\n ",
+				user_name, password, table_name, type, key, value);
+	}
 }

@@ -1,26 +1,33 @@
 package partitionManager;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import messages.ClientOPMsg;
 import messages.ClientOPResult;
+import messages.ClientOPResult.ClientOPStatus;
 import messages.PMAddressMsg;
-import messages.ClientOPResult.Status;
 import messages.Message.MessageType;
 
 public class PMMessageHandler implements Runnable {
 
+	static final Logger logger = LoggerFactory.getLogger(PMMessageHandler.class);
 	Socket socket;
 	PartitionManagerDB pm_db;
 	
 	public PMMessageHandler(Socket socket, PartitionManagerDB pm_db) {
+		logger.debug("New PMMessageHandler created");
 		this.socket = socket;
 		this.pm_db = pm_db;
 	}
@@ -31,6 +38,8 @@ public class PMMessageHandler implements Runnable {
 			
 			BufferedReader inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			MessageType type = MessageType.valueOf(inputReader.readLine());
+			logger.info("Handling message of type: {}", type);
+			
 			switch(type){
 			case CLIENT_OPERATION:
 				executeClientOperation();
@@ -49,55 +58,66 @@ public class PMMessageHandler implements Runnable {
 		try{
 			InputStreamReader in = new InputStreamReader(socket.getInputStream());
 			JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
-			ClientOPMsg msg = (ClientOPMsg) jaxb_context.createUnmarshaller().unmarshal(in);
+			ClientOPMsg msg = (ClientOPMsg) jaxb_context.createUnmarshaller().unmarshal(in);			
+			logger.debug("Message headers:\n{}\n. Message content:{}", msg.getHeaders(), msg.toString());
 			
 			//TODO check if the check sum is fine
 			//TODO check if the user is authorized
 			
-			String value = "";
-			switch (msg.type){
-			case CREATE_TABLE:
-				pm_db.createTable(msg.table_name);
-				break;
-			case DROP_TABLE:
-				pm_db.dropTable(msg.table_name);
-				break;
-			case STORE:
-				pm_db.store(msg.table_name, msg.key, msg.value);
-				break;
-			case READ:
-				value = pm_db.read(msg.table_name, msg.key);
-				break;
-			case DELETE:
-				pm_db.delete(msg.table_name, msg.key);
-				break;
 			
-			default:
-				System.err.println("Partition Manager recieved unknown message type");
-				break;
+			ClientOPResult result = new ClientOPResult();			
+			try{				
+				switch (msg.type){
+				case CREATE_TABLE:
+					pm_db.createTable(msg.table_name);
+					break;
+				case DROP_TABLE:
+					pm_db.dropTable(msg.table_name);
+					break;
+				case STORE:
+					pm_db.store(msg.table_name, msg.key, msg.value);
+					break;
+				case READ:
+					result.vlaue = pm_db.read(msg.table_name, msg.key);
+					break;
+				case DELETE:
+					pm_db.delete(msg.table_name, msg.key);
+					break;
+				
+				default:
+					logger.warn("Partition manager recieved unknown message type: {}", msg.type);
+					break;
+				}
+			}catch(DBException e){
+				switch(e.cause){
+				case TABLE_DOESNT_EXIST:
+					result.status = ClientOPStatus.TABLE_DOESNT_EXIST;
+					break;
+				default:
+					break;
+				}
 			}
 			
 			
-			ClientOPResult result = new ClientOPResult();
-			result.status = Status.SUCCESS;
-			result.vlaue = value;
-			
-			jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);
-			
+			//Creating marshller
+			jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);			
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			
+			//Sending the result
 			OutputStream out = socket.getOutputStream();
 			PrintWriter pw = new PrintWriter(out, true);
-			 pw.println("PM_ADDRESS");
+			pw.println("PM_ADDRESS");
 			 
 			m.marshal( result, out );
 			out.flush();
 			out.close();
 			socket.close();
-			
-		}catch(Exception e){
-			e.printStackTrace();
+			logger.info("Handling request completed successfully");			
+		} catch (IOException e) {
+			logger.error("IO error occurred while handling message", e);
+		} catch (JAXBException e) {
+			logger.error("Jaxb error occurred while handling message", e);
 		}
 		
 	}

@@ -36,7 +36,7 @@ public class OrchestratorDB {
 		//Loading port
 		String port_str = xpath.compile("//Orchestrator[@id=1]/clients-port").evaluate(doc);
 		port = Integer.parseInt(port_str);
-		logger.info("Orchestrator Port: " + port);
+		logger.info("Orchestrator Port: " + port_str);
 		
 		//TODO temporarily for testing proposes. 
 		active_pm_address = "192.36.45.5:45";

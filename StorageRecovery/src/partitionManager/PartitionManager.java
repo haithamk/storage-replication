@@ -12,11 +12,16 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 
+import orchestrator.Orchestrator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 
 public class PartitionManager {
 	
+	static final Logger logger = LoggerFactory.getLogger(PartitionManager.class);
 	PartitionManagerDB pm_db;
 	private ExecutorService pool;
 	private ServerSocket commSocket;
@@ -24,53 +29,35 @@ public class PartitionManager {
 	
 	public PartitionManager(String node_id, String config_file){
 		try{
-			initDB(node_id, config_file);
-			
+			logger.info("Initalizing PartitionManager({})", node_id);			
+			pm_db = new PartitionManagerDB(node_id, config_file);
 			pool = Executors.newCachedThreadPool();
 			commSocket = new ServerSocket(pm_db.port);
+			logger.info("PartitionManager({}) initalized successfully", node_id);
 		}catch(Exception e){
-			e.printStackTrace();
+			logger.error("An error occurred while initalizing PartitionManager(" + node_id + ")", e);
 		}
 	}
-	
-	
-
-	
 	
 	
 	
 	public void run(){
 		Socket socket = null;
 		
+		logger.info("Starting the PartitionManager({})", pm_db.node_id);
 		while(true){
 			try {
 				socket = commSocket.accept();
+				logger.debug("New socket recieved");
 				//Execute method is NOT blocking function. The Job is saved and when
 				//There are available thread it will handle it.
 				pool.execute(new PMMessageHandler(socket, pm_db));
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("An error occurred while running PartitionManager(" + pm_db.node_id + ")", e);
 			}
 		}
 	}
 	
 	
-	
-	private void initDB(String node_id, String config_file) throws Exception{
-		pm_db = new PartitionManagerDB();
-		
-		//Loading XML document
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		docFactory.setNamespaceAware(true);
-		DocumentBuilder builder = docFactory.newDocumentBuilder();
-		Document doc = builder.parse(config_file);
-		
-		XPathFactory xpathFactory = XPathFactory.newInstance();
-		XPath xpath = xpathFactory.newXPath();
-		
-		String port_str = xpath.compile("//partition-manager/node-info[@id =" + node_id + "]/port").evaluate(doc);
-
-		pm_db.port = Integer.parseInt(port_str);
-	}
 
 }
