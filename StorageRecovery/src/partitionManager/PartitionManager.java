@@ -27,7 +27,7 @@ public class PartitionManager {
 			pm_db = new PartitionManagerDB(node_id, config_file);
 			pool = Executors.newCachedThreadPool();
 			commSocket = new ServerSocket(pm_db.port);
-			heartbeat_sender = new HeartbeatSender(node_id, pm_db.heartbeat_rate, pm_db.orch_ip, pm_db.orch_port);
+			//heartbeat_sender = new HeartbeatSender(node_id, pm_db.heartbeat_rate, pm_db.orch_ip, pm_db.orch_port);
 			logger.info("PartitionManager({}) initalized successfully", node_id);
 		}catch(Exception e){
 			logger.error("An error occurred while initalizing PartitionManager(" + node_id + ")", e);
@@ -38,7 +38,7 @@ public class PartitionManager {
 	
 	public void run(){
 		
-		heartbeat_sender.start();
+		//heartbeat_sender.start();
 		
 		Socket socket = null;		
 		logger.info("Starting the PartitionManager({})", pm_db.node_id);

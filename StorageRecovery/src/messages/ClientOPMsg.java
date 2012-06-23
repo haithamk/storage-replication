@@ -1,7 +1,9 @@
 package messages;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public class ClientOPMsg extends Message{
 
 	public enum OperationType{
@@ -10,6 +12,15 @@ public class ClientOPMsg extends Message{
 		STORE,
 		READ,
 		DELETE,
+	}
+	
+	public ClientOPMsg(){
+//		user_name = "";
+//		password = "";
+//		table_name = "";
+//		key = "";
+//		value = "";
+//		check_sum = "";
 	}
 	
 	@XmlElement
@@ -35,7 +46,7 @@ public class ClientOPMsg extends Message{
 	
 	
 	public String toString(){
-		return String.format("user name: %s\npassword: %s\ntable name: %s\ntype:%s\n key: %s\nvalue: %s\n ",
+		return String.format("user name: %s\npassword: %s\ntable name: %s\ntype:%s\nkey: %s\nvalue: %s\n ",
 				user_name, password, table_name, type, key, value);
 	}
 }

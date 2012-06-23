@@ -49,7 +49,7 @@ public class OrchestratorDB {
 		
 		//TODO temporarily for testing proposes. 
 		active_pm = new NodeInfo();
-		active_pm.address = "192.36.45.5:45";
+		active_pm.address = "127.0.0.1:43010";
 		
 		
 		nodes = new Hashtable<String, NodeInfo>();
@@ -79,7 +79,8 @@ public class OrchestratorDB {
 	
 	
 	public void logHeartbeat(String id){
-		NodeInfo 
+		NodeInfo node = nodes.get(id);
+		node.last_heartbeat = System.currentTimeMillis();
 	}
 	
 }

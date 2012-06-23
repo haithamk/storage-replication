@@ -1,6 +1,7 @@
 package partitionManager;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -13,6 +14,8 @@ import javax.xml.bind.Marshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import utilities.NoCloseInputStream;
 
 import messages.ClientOPMsg;
 import messages.ClientOPResult;
@@ -36,7 +39,8 @@ public class PMMessageHandler implements Runnable {
 	public void run() {
 		try {
 			
-			BufferedReader inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			DataInputStream inputReader = new DataInputStream(socket.getInputStream());
+			@SuppressWarnings("deprecation")
 			MessageType type = MessageType.valueOf(inputReader.readLine());
 			logger.info("Handling message of type: {}", type);
 			
@@ -56,10 +60,10 @@ public class PMMessageHandler implements Runnable {
 	
 	public void executeClientOperation(){
 		try{
-			InputStreamReader in = new InputStreamReader(socket.getInputStream());
+			NoCloseInputStream in = new NoCloseInputStream(socket.getInputStream());
 			JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
 			ClientOPMsg msg = (ClientOPMsg) jaxb_context.createUnmarshaller().unmarshal(in);			
-			logger.debug("Message headers:\n{}\n. Message content:{}", msg.getHeaders(), msg.toString());
+			logger.debug("Message headers:\n{}\nMessage content:\n{}", msg.getHeaders(), msg.toString());
 			
 			//TODO check if the check sum is fine
 			//TODO check if the user is authorized
@@ -100,14 +104,14 @@ public class PMMessageHandler implements Runnable {
 			
 			
 			//Creating marshller
-			jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);			
+			jaxb_context = JAXBContext.newInstance(ClientOPResult.class);			
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			
 			//Sending the result
 			OutputStream out = socket.getOutputStream();
 			PrintWriter pw = new PrintWriter(out, true);
-			pw.println("PM_ADDRESS");
+			pw.println(MessageType.CLIENT_OP_RESULT);
 			 
 			m.marshal( result, out );
 			out.flush();

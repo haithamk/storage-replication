@@ -87,6 +87,7 @@ public class OrchMessageHandler implements Runnable {
 			m.marshal( reply, out );
 			out.flush();
 			out.close();
+			//socket.shutdownOutput();
 			socket.close();
 			logger.info("Handling request completed successfully");
 			

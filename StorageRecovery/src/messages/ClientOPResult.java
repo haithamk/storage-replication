@@ -1,7 +1,9 @@
 package messages;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public class ClientOPResult extends Message{
 	public enum ClientOPStatus{
 		SUCCESS,

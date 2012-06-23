@@ -44,7 +44,7 @@ public class PartitionManagerDB {
 		XPath xpath = xpathFactory.newXPath();
 		
 		//Loading port
-		String dummy_str = xpath.compile("//partition-manager/node-info[@id =" + node_id + "]/port").evaluate(doc);
+		String dummy_str = xpath.compile("//PartitionManager[@id =" + node_id + "]/port").evaluate(doc);
 		port = Integer.parseInt(dummy_str);
 		logger.info(" PartitionManagerDB({}) Port: {}", node_id, port);
 		
@@ -59,6 +59,11 @@ public class PartitionManagerDB {
 		dummy_str = xpath.compile("//General/heartbeat-rate").evaluate(doc);
 		heartbeat_rate = Integer.parseInt(dummy_str);
 		logger.info("Heart beat rate: {}", heartbeat_rate);
+		
+		
+		
+		//Init DB variables
+		tables = new Hashtable<String, Table>();
 	}
 	
 	/**
