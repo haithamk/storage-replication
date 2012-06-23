@@ -46,7 +46,7 @@ public class PhoneBookShow1 extends javax.swing.JFrame {
 
         jLabel4.setFont(new java.awt.Font("Lucida Sans Typewriter", 2, 10)); 
         jLabel4.setText("Don't have PhoneBook backup yet? Sign up");
-
+/*
         password.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 passwordActionPerformed(evt);
@@ -58,7 +58,7 @@ public class PhoneBookShow1 extends javax.swing.JFrame {
                 new_user_nameActionPerformed(evt);
             }
         });
-
+*/
         jButton2.setText("Sign in");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -71,7 +71,7 @@ public class PhoneBookShow1 extends javax.swing.JFrame {
 
         jLabel6.setFont(new java.awt.Font("Arial", 0, 14)); 
         jLabel6.setText("Password:");
-
+/*
         user_name.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 user_nameActionPerformed(evt);
@@ -83,7 +83,7 @@ public class PhoneBookShow1 extends javax.swing.JFrame {
                 new_passwordActionPerformed(evt);
             }
         });
-
+*/
         jButton3.setText("Sign up");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -169,7 +169,7 @@ public class PhoneBookShow1 extends javax.swing.JFrame {
         pack();
     }
 
-    private void user_nameActionPerformed(java.awt.event.ActionEvent evt) {                                          
+/*    private void user_nameActionPerformed(java.awt.event.ActionEvent evt) {                                          
         name=user_name.getText();
     }                                         
 
@@ -180,9 +180,15 @@ public class PhoneBookShow1 extends javax.swing.JFrame {
             password_=password_+Character.toString(temp[i]);
         }
     }                                        
-
+*/
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {                                         
-        user_name.setText("");
+        name=user_name.getText();
+    	char[] temp=password.getPassword();
+        password_="";
+        for(int i=0;i<temp.length;++i){
+            password_=password_+Character.toString(temp[i]);
+        }
+    	user_name.setText("");
         password.setText("");
         String user_password=ClientMain.findClient(name);
         if(user_password==null){
@@ -222,11 +228,17 @@ public class PhoneBookShow1 extends javax.swing.JFrame {
     }                                        
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {                                         
-        ClientMain.addClient(name, password_);
+        name=new_user_name.getText();
+        char[] temp=new_password.getPassword();
+        password_="";
+        for(int i=0;i<temp.length;++i){
+            password_=password_+Character.toString(temp[i]);
+        }
+    	ClientMain.addClient(name, password_);
         new_user_name.setText("");
         new_password.setText("");    
     }                                        
-
+/*
     private void new_user_nameActionPerformed(java.awt.event.ActionEvent evt) {                                              
         name=new_user_name.getText();
     }                                             
@@ -238,7 +250,7 @@ public class PhoneBookShow1 extends javax.swing.JFrame {
             password_=password_+Character.toString(temp[i]);
         }
     }                                            
-
+*/
     /**
      * @param args the command line arguments
      */
