@@ -46,6 +46,34 @@ public class OrchestratorDB {
 			this.last_heartbeat = 0;
 			this.alive = false;
 		}
+		
+		
+		public boolean isAlive(){
+			return alive;
+		}
+		
+		public boolean refreshStatus(long time_out){
+			if(System.currentTimeMillis() - last_heartbeat > time_out){
+				alive = false;
+			}else{
+				alive = true;
+			}
+			
+			return alive;
+			
+			
+//			synchronized (id) {
+//				
+//			}
+		}
+		
+		
+		public void logHeartbeat(){
+			last_heartbeat = System.currentTimeMillis();
+//			synchronized (id) {
+//				
+//			}
+		}
 	}
 	
 	
@@ -53,6 +81,8 @@ public class OrchestratorDB {
 	public int port;
 	public NodeInfo active_pm;
 	Hashtable<String, NodeInfo> nodes;
+	public int time_out;
+	public int refresh_rate;
 	
 	
 	
@@ -67,10 +97,17 @@ public class OrchestratorDB {
 		XPath xpath = xpathFactory.newXPath();
 		
 		//Loading port
-		String port_str = xpath.compile("//Orchestrator[@id=" + id+ "]/port").evaluate(doc);
-		port = Integer.parseInt(port_str);
-		logger.info("Orchestrator Port: " + port_str);
+		String dummy_str = xpath.compile("//Orchestrator[@id=" + id+ "]/port").evaluate(doc);
+		port = Integer.parseInt(dummy_str);
+		logger.info("Orchestrator Port: " + dummy_str);
 		
+		dummy_str = xpath.compile("//General/heartbeat-timeout").evaluate(doc);
+		time_out = Integer.parseInt(dummy_str);
+		logger.info("Heartbeat time-out: {}", dummy_str);
+		
+		dummy_str = xpath.compile("//Orchestrator[@id=" + id+ "]/nodes-refresh-rate").evaluate(doc);
+		refresh_rate = Integer.parseInt(dummy_str);
+		logger.info("Nodes refresh rate: {}", dummy_str);
 		
 		initNodes(doc);
 	}

@@ -1,0 +1,82 @@
+2012-06-23 15:08:07,650 INFO main utilities.StorageRecoveryMain - New node initiated with parameters: Type: PartitionManager ID: 10 Config: ../config.xml
+2012-06-23 15:08:07,653 INFO main partitionManager.PartitionManager - Initalizing PartitionManager(10)
+2012-06-23 15:08:07,654 INFO main partitionManager.PartitionManagerDB - Initalizing PartitionManagerDB(10) DB
+2012-06-23 15:08:07,676 INFO main partitionManager.PartitionManagerDB -  PartitionManagerDB(10) Port: 43010
+2012-06-23 15:08:07,678 INFO main partitionManager.PartitionManagerDB - Orchestrator IP: 127.0.0.1, port: 43000
+2012-06-23 15:08:07,680 INFO main partitionManager.PartitionManagerDB - Heart beat rate: 100
+2012-06-23 15:08:07,686 INFO main partitionManager.PartitionManager - PartitionManager(10) initalized successfully
+2012-06-23 15:08:07,687 INFO main partitionManager.PartitionManager - Starting the PartitionManager(10)
+2012-06-23 15:08:07,687 INFO Thread-1 utilities.HeartbeatSender - Heartbeat sender started
+2012-06-23 15:32:05,404 DEBUG main partitionManager.PartitionManager - New socket recieved
+2012-06-23 15:32:05,406 DEBUG main partitionManager.PMMessageHandler - New PMMessageHandler created
+2012-06-23 15:32:05,409 INFO pool-2-thread-1 partitionManager.PMMessageHandler - Handling message of type: CLIENT_OPERATION
+2012-06-23 15:32:05,479 DEBUG pool-2-thread-1 partitionManager.PMMessageHandler - Message headers:
+Source: 
+Dest: 
+Time: 1340454725405
+Message content:
+user name: null
+password: null
+table name: MyTable
+type:CREATE_TABLE
+key: null
+value: null
+ 
+2012-06-23 15:32:05,480 DEBUG pool-2-thread-1 partitionManager.PartitionManagerDB - Creating table: MyTable
+2012-06-23 15:32:05,489 INFO pool-2-thread-1 partitionManager.PMMessageHandler - Handling request completed successfully
+2012-06-23 15:32:05,498 DEBUG main partitionManager.PartitionManager - New socket recieved
+2012-06-23 15:32:05,499 DEBUG main partitionManager.PMMessageHandler - New PMMessageHandler created
+2012-06-23 15:32:05,499 INFO pool-2-thread-1 partitionManager.PMMessageHandler - Handling message of type: CLIENT_OPERATION
+2012-06-23 15:32:05,509 DEBUG pool-2-thread-1 partitionManager.PMMessageHandler - Message headers:
+Source: 
+Dest: 
+Time: 1340454725498
+Message content:
+user name: null
+password: null
+table name: MyTable
+type:STORE
+key: Name
+value: Haitham
+ 
+2012-06-23 15:32:05,510 DEBUG pool-2-thread-1 partitionManager.PartitionManagerDB - Storing to tbale name: MyTable. key: Name value: Haitham
+2012-06-23 15:32:05,510 DEBUG pool-2-thread-1 partitionManager.Table - Acquirung lock for key: Name from table: MyTable
+2012-06-23 15:32:05,510 DEBUG pool-2-thread-1 partitionManager.Table - Data object doesn't exist. Acquirung write lock
+2012-06-23 15:32:05,511 DEBUG pool-2-thread-1 partitionManager.Table - Data object still doesn't exist. creating new one
+2012-06-23 15:32:05,515 INFO pool-2-thread-1 partitionManager.PMMessageHandler - Handling request completed successfully
+2012-06-23 15:32:05,520 DEBUG main partitionManager.PartitionManager - New socket recieved
+2012-06-23 15:32:05,520 DEBUG main partitionManager.PMMessageHandler - New PMMessageHandler created
+2012-06-23 15:32:05,520 INFO pool-2-thread-1 partitionManager.PMMessageHandler - Handling message of type: CLIENT_OPERATION
+2012-06-23 15:32:05,528 DEBUG pool-2-thread-1 partitionManager.PMMessageHandler - Message headers:
+Source: 
+Dest: 
+Time: 1340454725519
+Message content:
+user name: null
+password: null
+table name: MyTable
+type:STORE
+key: Name
+value: Muhammed
+ 
+2012-06-23 15:32:05,529 DEBUG pool-2-thread-1 partitionManager.PartitionManagerDB - Storing to tbale name: MyTable. key: Name value: Muhammed
+2012-06-23 15:32:05,530 DEBUG pool-2-thread-1 partitionManager.Table - Acquirung lock for key: Name from table: MyTable
+2012-06-23 15:32:05,533 INFO pool-2-thread-1 partitionManager.PMMessageHandler - Handling request completed successfully
+2012-06-23 15:32:05,538 DEBUG main partitionManager.PartitionManager - New socket recieved
+2012-06-23 15:32:05,538 DEBUG main partitionManager.PMMessageHandler - New PMMessageHandler created
+2012-06-23 15:32:05,539 INFO pool-2-thread-1 partitionManager.PMMessageHandler - Handling message of type: CLIENT_OPERATION
+2012-06-23 15:32:05,548 DEBUG pool-2-thread-1 partitionManager.PMMessageHandler - Message headers:
+Source: 
+Dest: 
+Time: 1340454725538
+Message content:
+user name: null
+password: null
+table name: MyTable
+type:READ
+key: Name
+value: null
+ 
+2012-06-23 15:32:05,549 DEBUG pool-2-thread-1 partitionManager.PartitionManagerDB - Reading from table: MyTable. key: Name
+2012-06-23 15:32:05,550 DEBUG pool-2-thread-1 partitionManager.Table - Acquirung lock for key: Name from table: MyTable
+2012-06-23 15:32:05,555 INFO pool-2-thread-1 partitionManager.PMMessageHandler - Handling request completed successfully

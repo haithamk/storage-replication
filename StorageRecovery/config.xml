@@ -1,13 +1,14 @@
 <config>
 	<General>
 		<heartbeat-rate>100</heartbeat-rate> <!-- Heartbeat rate in ms-->
+		<heartbeat-timeout>1000</heartbeat-timeout>
 	</General>
 	
 	<Orchestrators>
 		<Orchestrator id="0">
-			<ip>127.0.0.1</ip>
-			
+			<ip>127.0.0.1</ip>			
 			<port>43000</port>
+			<nodes-refresh-rate>200</nodes-refresh-rate>
 		</Orchestrator>
 	</Orchestrators>
 	
@@ -16,6 +17,12 @@
 			<ip>127.0.0.1</ip>
 			<port>43010</port>
 		</PartitionManager>
+		
+		<PartitionManager id = "11">
+			<ip>127.0.0.1</ip>
+			<port>43011</port>
+		</PartitionManager>
+		
 	</PartitionManagers>
 	
 </config>

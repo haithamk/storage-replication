@@ -1,0 +1,9 @@
+2012-06-23 14:22:27,312 INFO main utilities.StorageRecoveryMain - New node initiated with parameters: Type: PartitionManager ID: 10 Config: ../config.xml
+2012-06-23 14:22:27,314 INFO main partitionManager.PartitionManager - Initalizing PartitionManager(10)
+2012-06-23 14:22:27,315 INFO main partitionManager.PartitionManagerDB - Initalizing PartitionManagerDB(10) DB
+2012-06-23 14:22:27,339 INFO main partitionManager.PartitionManagerDB -  PartitionManagerDB(10) Port: 43010
+2012-06-23 14:22:27,342 INFO main partitionManager.PartitionManagerDB - Orchestrator IP: 127.0.0.1, port: 43000
+2012-06-23 14:22:27,343 INFO main partitionManager.PartitionManagerDB - Heart beat rate: 100
+2012-06-23 14:22:27,349 INFO main partitionManager.PartitionManager - PartitionManager(10) initalized successfully
+2012-06-23 14:22:27,350 INFO main partitionManager.PartitionManager - Starting the PartitionManager(10)
+2012-06-23 14:22:27,350 INFO Thread-1 utilities.HeartbeatSender - Heartbeat sender started

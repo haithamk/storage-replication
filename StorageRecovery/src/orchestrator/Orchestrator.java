@@ -18,6 +18,7 @@ public class Orchestrator {
 	private ServerSocket commSocket;
 	OrchestratorDB orch_db;
 	HeartBeatListener heartbeat_listener;
+	NodesManager nodes_manager;
 	
 	
 	/**
@@ -32,6 +33,7 @@ public class Orchestrator {
 			pool = Executors.newCachedThreadPool();
 			commSocket = new ServerSocket(orch_db.port);
 			heartbeat_listener = new HeartBeatListener(orch_db);
+			nodes_manager = new NodesManager(orch_db);
 			logger.info("Orchestrator initalized successfully");
 		}
 		catch(Exception e)
@@ -49,6 +51,7 @@ public class Orchestrator {
 		
 		logger.info("Starting the Orchestrator");
 		heartbeat_listener.start();
+		nodes_manager.start();
 		Socket socket = null;		
 		while(true){
 			try {
