@@ -155,9 +155,9 @@ public class OrchestratorDB {
 	/**
 	 * Atomically set the active PM address
 	 */
-	public void setActivePM(String new_pm){
+	public void setActivePM(NodeInfo new_pm){
 		synchronized(nodes){
-			active_pm.address = new_pm;
+			active_pm = new_pm;
 			logger.debug("setActivePM: {}", new_pm);
 		}
 	}

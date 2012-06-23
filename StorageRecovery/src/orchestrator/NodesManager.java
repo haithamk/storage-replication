@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import orchestrator.OrchestratorDB.NodeInfo;
+import orchestrator.OrchestratorDB.NodeInfo.NodeType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,30 @@ public class NodesManager extends Thread {
 		
 	}
 	
-	private void handleDeadNode(NodeInfo node_info){
-		System.err.println("Node " + node_info.id + " Is dead!");
+	private void handleDeadNode(NodeInfo dead_node_info){
+		System.err.println("Node " + dead_node_info.id + " Is dead!");
+		
+		//TODO review synchronization
+		if(dead_node_info.id.equals(orch_db.active_pm.id)){
+			logger.info("Current Partition Manager({}) is dead. Electing new Partition Manager", dead_node_info.id);
+			NodeInfo new_active_pm = null;
+			Set<String> ids = orch_db.nodes.keySet();
+			Iterator<String> iterator = ids.iterator();
+			while(iterator.hasNext()){
+				String id = iterator.next();
+				NodeInfo node_info = orch_db.nodes.get(id);
+				if(node_info.type == NodeType.PartitionManager && node_info.isAlive()){
+					new_active_pm = node_info;
+					break;
+				}
+			}
+			
+			if(new_active_pm != null){
+				logger.info("New active Partiton Mananger id: {}", new_active_pm.id);
+			}else{
+				logger.warn("No availbe Partition Managers");
+			}
+			orch_db.setActivePM(new_active_pm);			
+		}
 	}
 }
