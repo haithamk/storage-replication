@@ -1,9 +1,7 @@
 package partitionManager;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -20,7 +18,6 @@ import utilities.NoCloseInputStream;
 import messages.ClientOPMsg;
 import messages.ClientOPResult;
 import messages.ClientOPResult.ClientOPStatus;
-import messages.PMAddressMsg;
 import messages.Message.MessageType;
 
 public class PMMessageHandler implements Runnable {

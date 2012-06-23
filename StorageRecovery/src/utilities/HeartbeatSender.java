@@ -14,11 +14,14 @@ public class HeartbeatSender extends Thread {
 
 	static final Logger logger = LoggerFactory.getLogger(HeartbeatSender.class);
 	
+	int rate;
 	DatagramPacket packet;
 	DatagramSocket client_socket;
 	
+	
 	public HeartbeatSender(String id, int rate, String dest_ip, int dest_port){
 		try{
+			this.rate = rate;
 			byte[] id_bytes = id.getBytes();			
 			InetAddress dest_address = InetAddress.getByName(dest_ip);
 			
@@ -48,8 +51,11 @@ public class HeartbeatSender extends Thread {
 			
 			try {
 				client_socket.send(packet);
+				sleep(rate);
 			} catch (IOException e) {
 				logger.warn("Error while sending heartbeat packet to the destination", e);
+			} catch (InterruptedException e) {
+				logger.warn("Heartbeat sender thread interrupted while sleeping", e);
 			}
 			
 		}
