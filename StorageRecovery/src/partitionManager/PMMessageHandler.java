@@ -108,7 +108,7 @@ public class PMMessageHandler implements Runnable {
 			//Sending the result
 			OutputStream out = socket.getOutputStream();
 			PrintWriter pw = new PrintWriter(out, true);
-			pw.println(MessageType.CLIENT_OP_RESULT);
+			//pw.println(MessageType.CLIENT_OP_RESULT);
 			 
 			m.marshal( result, out );
 			out.flush();
