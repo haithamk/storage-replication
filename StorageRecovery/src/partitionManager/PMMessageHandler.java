@@ -100,7 +100,7 @@ public class PMMessageHandler implements Runnable {
 			}
 			
 			
-			//Creating marshller
+			//Creating marshaler
 			jaxb_context = JAXBContext.newInstance(ClientOPResult.class);			
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);

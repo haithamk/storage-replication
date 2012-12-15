@@ -8,7 +8,7 @@
 		<Orchestrator id="0">
 			<ip>127.0.0.1</ip>			
 			<port>43000</port>
-			<nodes-refresh-rate>200</nodes-refresh-rate>
+			<nodes-refresh-rate>1000</nodes-refresh-rate>
 		</Orchestrator>
 	</Orchestrators>
 	

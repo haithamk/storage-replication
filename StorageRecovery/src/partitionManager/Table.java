@@ -9,8 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Table{
+
+	//=========================================================================
+	//================			Inner Classes					===============
+	//=========================================================================
 	
-	class Data{
+	
+	private class Data{
 		String value;
 		ReentrantReadWriteLock lock;
 		
@@ -25,6 +30,10 @@ public class Table{
 	}
 	
 	
+	//=========================================================================
+	//================		Members of Table class				===============
+	//=========================================================================
+	
 	private static final Logger logger = LoggerFactory.getLogger(Table.class);
 	private String table_name;
 	private Hashtable<String, Data> table;
@@ -32,6 +41,9 @@ public class Table{
 	private ReentrantReadWriteLock lock;
 	
 	
+	//=========================================================================
+	//================			Public Methods					===============
+	//=========================================================================
 	
 	public Table(String table_name){
 		this.table_name = table_name;
@@ -40,9 +52,53 @@ public class Table{
 		lock = new ReentrantReadWriteLock();
 	}
 	
+		
+	public void store(String key, String value){
+		ReentrantReadWriteLock lock = getRowLock(key);
+		lock.writeLock().lock();
+		Data data = table.get(key);
+		if(data != null){
+			data.value = value;
+		}else{
+			//This case SHOULDN'T happen ever. since the thread adding a new value should lock the row first
+			logger.debug("Severe Error occurred!! attemping to store a value to non-existing row");
+		}
+		lock.writeLock().unlock();		
+	}
 	
 	
-	public ReentrantReadWriteLock getRowLock(String key){
+	public String read(String key){
+		ReentrantReadWriteLock lock = getRowLock(key);
+		lock.readLock().lock();
+		Data data = table.get(key);
+		String result = null;
+		if(data != null){
+			result =  data.value;
+	
+		}else{
+			//This case SHOULDN'T happen ever. since the thread adding a new value should lock the row first
+			logger.debug("Severe Error occurred!! attemping to store a value to non-existing row");
+		}
+		lock.readLock().unlock();
+		return result;
+	}
+	
+	
+	
+	public void delete(String key){
+		ReentrantReadWriteLock lock = getRowLock(key);
+		lock.writeLock().lock();
+		table.remove(key);
+		lock.writeLock().unlock();
+	}
+	
+	
+	
+	//=========================================================================
+	//================			Auxiliary Methods				===============
+	//=========================================================================
+	
+	private ReentrantReadWriteLock getRowLock(String key){
 		//Acquiring read lock to retrieve the data
 		logger.debug("Acquirung lock for key: {} from table: {}", key, table_name);
 		lock.readLock().lock();
@@ -69,36 +125,6 @@ public class Table{
 		lock.readLock().unlock();
 		
 		return data.lock;
-	}
-	
-	
-	
-	
-	public void store(String key, String value){
-		Data data = table.get(key);
-		if(data == null){
-			//This case SHOULDN'T happen ever. since the thread adding a new value should lock the row first
-			logger.debug("Severe Error occurred!! attemping to store a value to non-existing row");
-			return;
-		}
-		data.value = value;
-	}
-	
-	
-	public String read(String key){
-		Data data = table.get(key);
-		if(data == null){
-			//This case SHOULDN'T happen ever. since the thread adding a new value should lock the row first
-			logger.debug("Severe Error occurred!! attemping to store a value to non-existing row");
-			return null;
-		}
-		
-		return data.value;
-	}
-	
-	
-	public void delete(String key){
-		table.remove(key);
 	}
 	
 }

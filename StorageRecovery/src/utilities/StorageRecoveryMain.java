@@ -10,6 +10,8 @@ import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import client.Client;
+
 
 public class StorageRecoveryMain {
 
@@ -35,7 +37,9 @@ public class StorageRecoveryMain {
 			PartitionManager part_man = new PartitionManager(node_id, config_file);
 			part_man.run();
 		}else if(type.equals("DataNode")){
-			
+			//TODO
+		}else if(type.equals("Client")){
+			Client client = new Client(node_id, config_file);
 		}else{
 			logger.error("Unkown type!");
 		}

@@ -1,0 +1,5 @@
+Welcome To the Storage Recovery Application
+=====================================================
+You can use the following commands:
+
+GETPM	gets the current active partition manager from the Orchestrator

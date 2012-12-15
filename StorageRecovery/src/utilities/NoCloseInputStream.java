@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 
 /**
- * A wrapper class for the input stream. Useful for avoiding implict close of the
+ * A wrapper class for the input stream. Useful for avoiding implicit close of the
  * input stream by class such as JAXB Unmarshaller 
  */
 public class NoCloseInputStream extends FilterInputStream {
