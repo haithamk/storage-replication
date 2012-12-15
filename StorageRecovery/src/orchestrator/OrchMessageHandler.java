@@ -82,7 +82,7 @@ public class OrchMessageHandler implements Runnable {
 			logger.debug("Sending reply");
 			OutputStream out = socket.getOutputStream();
 			PrintWriter pw = new PrintWriter(out, true);
-			pw.println("PM_ADDRESS");
+			//pw.println("PM_ADDRESS");
 			 
 			m.marshal( reply, out );
 			out.flush();
