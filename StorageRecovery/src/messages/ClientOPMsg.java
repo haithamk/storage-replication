@@ -1,11 +1,13 @@
 package messages;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class ClientOPMsg extends Message{
 
+	@XmlEnum(String.class)
 	public enum OperationType{
 		CREATE_TABLE,
 		DROP_TABLE,
@@ -15,12 +17,12 @@ public class ClientOPMsg extends Message{
 	}
 	
 	public ClientOPMsg(){
-//		user_name = "";
-//		password = "";
-//		table_name = "";
-//		key = "";
-//		value = "";
-//		check_sum = "";
+		user_name = "";
+		password = "";
+		table_name = "";
+		key = "";
+		value = "";
+		check_sum = "";
 	}
 	
 	@XmlElement

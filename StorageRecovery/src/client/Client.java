@@ -73,15 +73,15 @@ public class Client {
 		
 		if(cmds[0].equals("GETPM")){
 			getPM();
-		}else if(cmds[0].equals("CREATE")){
+		}else if(cmds[0].toUpperCase().equals("CREATE")){
 			createTable(cmds[1]);
-		}else if(cmds[0].equals("DROP")){
+		}else if(cmds[0].toUpperCase().equals("DROP")){
 			dropTable(cmds[1]);
-		}else if(cmds[0].equals("STORE")){
+		}else if(cmds[0].toUpperCase().equals("STORE")){
 			store(cmds[1], cmds[2], cmds[3]);
-		}else if(cmds[0].equals("READ")){
+		}else if(cmds[0].toUpperCase().equals("READ")){
 			read(cmds[1], cmds[2]);
-		}else if(cmds[0].equals("DELETE")){
+		}else if(cmds[0].toUpperCase().equals("DELETE")){
 			delete(cmds[1], cmds[2]);
 		}
 		
@@ -105,8 +105,12 @@ public class Client {
             //DebugUtility.printSocket(socket);
             JAXBContext jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);
             PMAddressMsg msg = (PMAddressMsg) jaxb_context.createUnmarshaller().unmarshal(in);	
-            System.out.println("Active PM Address: " + msg.msg_content);
-
+            logger.info("Active PM Address: " + msg.msg_content);
+            
+            String[] address = msg.msg_content.split(":");
+            pm_ip = address[0];
+            pm_port = Integer.parseInt(address[1]);
+            
             out.close();
             in.close();
             socket.close();
@@ -230,7 +234,6 @@ public class Client {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
             JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
-            jaxb_context = JAXBContext.newInstance(ClientOPResult.class);			
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.marshal( msg, out );
