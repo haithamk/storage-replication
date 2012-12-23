@@ -1,7 +1,9 @@
 package partitionManager;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -9,9 +11,14 @@ import java.net.Socket;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import debug.DebugUtility;
 
 import utilities.NoCloseInputStream;
 
@@ -58,13 +65,12 @@ public class PMMessageHandler implements Runnable {
 	public void executeClientOperation(){
 		try{
 			NoCloseInputStream in = new NoCloseInputStream(socket.getInputStream());
+			//DebugUtility.printSocket(socket);
 			JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
 			ClientOPMsg msg = (ClientOPMsg) jaxb_context.createUnmarshaller().unmarshal(in);			
 			logger.debug("Message headers:\n{}\nMessage content:\n{}", msg.getHeaders(), msg.toString());
-			
 			//TODO check if the check sum is fine
 			//TODO check if the user is authorized
-			
 			
 			ClientOPResult result = new ClientOPResult();			
 			try{				
@@ -107,9 +113,6 @@ public class PMMessageHandler implements Runnable {
 			
 			//Sending the result
 			OutputStream out = socket.getOutputStream();
-			PrintWriter pw = new PrintWriter(out, true);
-			//pw.println(MessageType.CLIENT_OP_RESULT);
-			 
 			m.marshal( result, out );
 			out.flush();
 			out.close();
