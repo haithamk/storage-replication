@@ -143,9 +143,11 @@ public class OrchestratorDB {
 	 * Atomically return the active PM address
 	 */
 	public String getActivePM(){
-		String current_pm;
+		String current_pm = "";
 		synchronized(nodes){
-			current_pm = active_pm.address;
+			if(active_pm != null){
+				current_pm = active_pm.address;
+			}
 			logger.debug("getActivePM: {}", current_pm);
 		}
 		
