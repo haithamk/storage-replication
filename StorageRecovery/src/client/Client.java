@@ -56,7 +56,7 @@ public class Client {
 		Scanner scanner = new Scanner( System.in );
 		while(true){
 			String str = scanner.nextLine();
-			if(str.equals("exist")){
+			if(str.equals("exit")){
 				break;
 			}else{
 				executeCommand(str);
@@ -71,7 +71,7 @@ public class Client {
 	private void executeCommand(String str){
 		String[] cmds = str.split(" ");
 		
-		if(cmds[0].equals("GETPM")){
+		if(cmds[0].toUpperCase().equals("GETPM")){
 			getPM();
 		}else if(cmds[0].toUpperCase().equals("CREATE")){
 			createTable(cmds[1]);
@@ -224,21 +224,22 @@ public class Client {
 	
 	private ClientOPResult executeOperationAux(ClientOPMsg msg) throws UnknownHostException, IOException{
 		Socket socket = null;
-        NoCloseOutputStream out = null;
+		PrintWriter out = null;
         BufferedReader in = null;
         ClientOPResult result = null;
  
         try {    
             socket = new Socket(pm_ip, pm_port);
-            out = new NoCloseOutputStream(socket.getOutputStream());
+            out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
+            out.print("CLIENT_OPERATION\n");
             JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.marshal( msg, out );
-			out.flush();
-
+			socket.shutdownOutput(); //To send EOF
+			
             jaxb_context = JAXBContext.newInstance(ClientOPResult.class);
             result = (ClientOPResult) jaxb_context.createUnmarshaller().unmarshal(in);	
 
@@ -255,7 +256,9 @@ public class Client {
 	
 	
 	
-	private void printManual(){
+private void printManual(){	
+	
+	
 		File sourceFile = new File ("manual.txt");
 		FileReader fr = null;
 		try {
