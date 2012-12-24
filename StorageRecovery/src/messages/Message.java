@@ -8,7 +8,9 @@ public abstract class Message {
 		GET_PM_ADDRESS,
 		PM_ADDRESS,
 		CLIENT_OPERATION,
-		CLIENT_OP_RESULT
+		CLIENT_OP_RESULT,
+		GET_TABLE_REPLICAS,
+		LOG_OPERATION
 	};
 	
 	

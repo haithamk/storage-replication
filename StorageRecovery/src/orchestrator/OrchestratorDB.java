@@ -2,6 +2,8 @@ package orchestrator;
 
 import java.io.IOException;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,6 +24,12 @@ import org.xml.sax.SAXException;
 
 public class OrchestratorDB {
 	
+	
+	//=========================================================================
+	//==================		Auxiliary classes				===============
+	//=========================================================================
+	
+	
 	static class NodeInfo{
 		enum NodeType{
 			PartitionManager,
@@ -33,10 +41,6 @@ public class OrchestratorDB {
 		String address;
 		long last_heartbeat;
 		boolean alive;
-		
-		public NodeInfo(){
-			
-		}
 		
 		public NodeInfo(String id, NodeType type, String address){
 			this.id = id;
@@ -60,22 +64,18 @@ public class OrchestratorDB {
 			}
 			
 			return alive;
-			
-			
-//			synchronized (id) {
-//				
-//			}
 		}
 		
 		
 		public void logHeartbeat(){
 			last_heartbeat = System.currentTimeMillis();
-//			synchronized (id) {
-//				
-//			}
 		}
 	}
 	
+	
+	//=========================================================================
+	//================		Members of the class				===============
+	//=========================================================================
 	
 	static final Logger logger = LoggerFactory.getLogger(OrchestratorDB.class);
 	public int port;
@@ -83,11 +83,89 @@ public class OrchestratorDB {
 	Hashtable<String, NodeInfo> nodes;
 	public int time_out;
 	public int refresh_rate;
+	public String id;
 	
 	
+	//=========================================================================
+	//====================		Public Methods				===================
+	//=========================================================================
 	
 	public OrchestratorDB(String id, String config_file) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
 		logger.info("Initalizing Orchestrator DB");
+		this.id = id;
+		initConfig(config_file);
+	}
+	
+	
+	/**
+	 * Atomically return the active PM address
+	 */
+	public String getActivePM(){
+		String current_pm = "";
+		synchronized(nodes){
+			if(active_pm != null){
+				current_pm = active_pm.address;
+			}
+			logger.debug("getActivePM: {}", current_pm);
+		}
+		
+		return current_pm;
+	}
+	
+	
+	/**
+	 * Atomically set the active PM address
+	 */
+	public void setActivePM(NodeInfo new_pm){
+		synchronized(nodes){
+			active_pm = new_pm;
+			logger.debug("setActivePM: {}", new_pm);
+		}
+	}
+	
+	
+	
+	public void logHeartbeat(String id){
+		NodeInfo node = nodes.get(id);
+		if(node == null){
+			logger.warn("Attemping to log heart beat for non existing node!");
+			return;
+		}
+		node.last_heartbeat = System.currentTimeMillis();
+	}
+	
+
+	/**
+	 * chooses replicas for a new table. The first replica in the returned array
+	 * is the master replica
+	 */
+	public String[] assignTableReplicas(String table_name){
+		//TODO implement properly
+		//The proper implementation chooses the replicas carefully to distribute the tables evenly among the data nodes
+		logger.info("Assigning replicas for {}", table_name);
+		String replicas[] = new String[3];
+		Set<String> nodes_ids = nodes.keySet();
+		Iterator<String> id_it = nodes_ids.iterator();
+		int num = 0;
+		while(id_it.hasNext() && num < 3){
+			String id = id_it.next();
+			NodeInfo node = nodes.get(id);
+			if(node.isAlive() && node.type == NodeType.DataNode){
+				logger.info("Assigned node: {} for replica: {} ", id, table_name);
+				replicas[num++] = node.address;
+			}
+		}
+		
+		return replicas;
+	}
+	
+	
+	
+	//=========================================================================
+	//================			Auxiliary Methods				===============
+	//=========================================================================
+			
+	private void initConfig(String config_file) throws ParserConfigurationException, XPathExpressionException, SAXException, IOException{
 		//Loading XML document
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		docFactory.setNamespaceAware(true);
@@ -131,47 +209,7 @@ public class OrchestratorDB {
 			if(active_pm == null){
 				active_pm = node_info;
 			}
-			
 		}
-		
-		
-		
-	}
-	
-	
-	/**
-	 * Atomically return the active PM address
-	 */
-	public String getActivePM(){
-		String current_pm = "";
-		synchronized(nodes){
-			if(active_pm != null){
-				current_pm = active_pm.address;
-			}
-			logger.debug("getActivePM: {}", current_pm);
-		}
-		
-		return current_pm;
-	}
-	
-	/**
-	 * Atomically set the active PM address
-	 */
-	public void setActivePM(NodeInfo new_pm){
-		synchronized(nodes){
-			active_pm = new_pm;
-			logger.debug("setActivePM: {}", new_pm);
-		}
-	}
-	
-	
-	public void logHeartbeat(String id){
-		NodeInfo node = nodes.get(id);
-		if(node == null){
-			logger.warn("Attemping to log heart beat for non existing node!");
-			return;
-		}
-		node.last_heartbeat = System.currentTimeMillis();
 	}
 	
 }

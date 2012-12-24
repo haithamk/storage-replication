@@ -8,6 +8,7 @@ public class ClientOPResult extends Message{
 	public enum ClientOPStatus{
 		SUCCESS,
 		FAIL,
+		DATA_NODE_FAIL,
 		NOT_AUTHORIZED,
 		TABLE_DOESNT_EXIST
 	}

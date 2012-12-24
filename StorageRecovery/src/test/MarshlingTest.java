@@ -22,9 +22,11 @@ public class MarshlingTest {
 	private static class PMMsg extends Msg{
 		@XmlElement
 		String y = "PMMsg";
+		@XmlElement
+		String[] bros = {"Haitham", "Loay", "Waael", "Omar"};
 	}
 	public static void main(String[] args) {
-		testUnmarshal();
+		testMarshal();
 		
 		
 	}

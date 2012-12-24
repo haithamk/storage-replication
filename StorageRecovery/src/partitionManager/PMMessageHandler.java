@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -23,16 +24,29 @@ import debug.DebugUtility;
 import utilities.NoCloseInputStream;
 
 import messages.ClientOPMsg;
+import messages.LogMessage;
+import messages.ClientOPMsg.OperationType;
 import messages.ClientOPResult;
 import messages.ClientOPResult.ClientOPStatus;
+import messages.LogResult;
 import messages.Message.MessageType;
 
 public class PMMessageHandler implements Runnable {
 
+	
+	//=========================================================================
+	//================		Members of the class				===============
+	//=========================================================================
+	
 	static final Logger logger = LoggerFactory.getLogger(PMMessageHandler.class);
 	Socket socket;
 	PartitionManagerDB pm_db;
 	
+	
+	
+	//=========================================================================
+	//====================		Public Methods				===================
+	//=========================================================================
 	public PMMessageHandler(Socket socket, PartitionManagerDB pm_db) {
 		logger.debug("New PMMessageHandler created");
 		this.socket = socket;
@@ -50,7 +64,7 @@ public class PMMessageHandler implements Runnable {
 			
 			switch(type){
 			case CLIENT_OPERATION:
-				executeClientOperation();
+				handleClientOperation();
 				break;
 			default:
 				break;					
@@ -61,50 +75,23 @@ public class PMMessageHandler implements Runnable {
 		
 	}
 	
-	
-	public void executeClientOperation(){
+	//=========================================================================
+	//================			Auxiliary Methods				===============
+	//=========================================================================
+		
+	/**
+	 * Unmarshalls the Client request, executes it and returns a result to the user.
+	 */
+	private void handleClientOperation(){
 		try{
 			NoCloseInputStream in = new NoCloseInputStream(socket.getInputStream());
-			//DebugUtility.printSocket(socket);
 			JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
 			ClientOPMsg msg = (ClientOPMsg) jaxb_context.createUnmarshaller().unmarshal(in);			
 			logger.debug("Message headers:\n{}\nMessage content:\n{}", msg.getHeaders(), msg.toString());
 			//TODO check if the check sum is fine
 			//TODO check if the user is authorized
 			
-			ClientOPResult result = new ClientOPResult();			
-			try{				
-				switch (msg.type){
-				case CREATE_TABLE:
-					pm_db.createTable(msg.table_name);
-					break;
-				case DROP_TABLE:
-					pm_db.dropTable(msg.table_name);
-					break;
-				case STORE:
-					pm_db.store(msg.table_name, msg.key, msg.value);
-					break;
-				case READ:
-					result.vlaue = pm_db.read(msg.table_name, msg.key);
-					break;
-				case DELETE:
-					pm_db.delete(msg.table_name, msg.key);
-					break;
-				
-				default:
-					logger.warn("Partition manager recieved unknown message type: {}", msg.type);
-					break;
-				}
-			}catch(DBException e){
-				switch(e.cause){
-				case TABLE_DOESNT_EXIST:
-					result.status = ClientOPStatus.TABLE_DOESNT_EXIST;
-					break;
-				default:
-					break;
-				}
-			}
-			
+			ClientOPResult result = executeClientOperation(msg);
 			
 			//Creating marshaler
 			jaxb_context = JAXBContext.newInstance(ClientOPResult.class);			
@@ -125,5 +112,148 @@ public class PMMessageHandler implements Runnable {
 		}
 		
 	}
+	
+	
+	/**
+	 * Executes the given operation.
+	 * First the operation is logged to the Data nodes. If and only if the logging
+	 * succeeded the operation will be executed locally. 
+	 */
+	private ClientOPResult executeClientOperation(ClientOPMsg msg){
+		ClientOPResult result = new ClientOPResult();			
+		try{	
+			
+			LogResult log_result = logOperation(msg); 
+			if(!log_result.status){
+				result.status = ClientOPStatus.DATA_NODE_FAIL;
+				return result;
+			}
+			
+			if(msg.type == OperationType.CREATE_TABLE){
+				pm_db.createTable(msg.table_name);
+			}else if(msg.type == OperationType.DROP_TABLE){
+				pm_db.dropTable(msg.table_name);
+			}else if(msg.type == OperationType.STORE){
+				pm_db.store(msg.table_name, msg.key, msg.value);
+			}else if(msg.type == OperationType.READ){
+				result.vlaue = pm_db.read(msg.table_name, msg.key);
+			}else if(msg.type == OperationType.DELETE){
+				pm_db.delete(msg.table_name, msg.key);
+			}else{
+				logger.warn("Partition manager recieved unknown message type: {}", msg.type);
+			}
+		}catch(DBException e){
+			switch(e.cause){
+			case TABLE_DOESNT_EXIST:
+				result.status = ClientOPStatus.TABLE_DOESNT_EXIST;
+				break;
+			default:
+				break;
+			}
+		}
+		return result;
+	}
+	
+	
+	/**
+	 * Logs an operation to the data nodes. The master data node is located and
+	 *  the request is sent to him. 
+	 */
+	private LogResult logOperation(ClientOPMsg msg){
+		LogMessage log_message = new LogMessage();
+		log_message.table_name = msg.table_name;
+		
+		String master_replica = getMasterReplica();
+		
+		if(msg.type == OperationType.CREATE_TABLE){
+			String[] replicas = assignReplicas(msg.table_name);
+			log_message.replicas = replicas;
+		}else if(msg.type == OperationType.DROP_TABLE){
+			freeReplicas(msg.table_name);
+			log_message.operation = "DROP";
+		}else if(msg.type == OperationType.STORE){
+			log_message.key = msg.key;
+			log_message.value = msg.value;
+		}else if(msg.type == OperationType.READ){
+			log_message.key = msg.key;
+		}else if(msg.type == OperationType.DELETE){
+			log_message.key = msg.key;
+		}else{
+			logger.warn("Partition manager recieved unknown message type: {}", msg.type);
+		}
+		
+		return sendLogMessage(master_replica, log_message);
+	}
+	
+	
+	
+	/**
+	 * Send the LogMessage to the given address via TCP connection. Returns the
+	 * result recieved from the remote node. Or an empty result with the error
+	 * code if an error occurs
+	 */
+	private LogResult sendLogMessage(String address, LogMessage log_message){
+		Socket socket = null;
+		PrintWriter out = null;
+        BufferedReader in = null;
+        LogResult result = null;
+        
+        try {   
+        	String ip = address.split(":")[0];
+        	int port = Integer.parseInt(address.split(":")[1]);
+            socket = new Socket(ip, port);
+            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            out.print(MessageType.LOG_OPERATION + "\n");
+            JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
+			Marshaller m = jaxb_context.createMarshaller();
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			m.marshal( log_message, out );
+			socket.shutdownOutput(); //To send EOF
+			
+            jaxb_context = JAXBContext.newInstance(LogResult.class);
+            result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(in);	
+
+            out.close();
+            in.close();
+            socket.close();
+        } catch (JAXBException e) {
+			logger.error("Error marshling/unmarshling", e);
+		} catch (UnknownHostException e) {
+			logger.error("Error communicating with the remote node", e);
+		} catch (IOException e) {
+			logger.error("Error communicating with the remote node", e);
+		}
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Returns the master replica of the given table 
+	 */
+	private String getMasterReplica(){
+		//TODO
+		return "";
+	}
+	
+	
+	/**
+	 * Contacts the Orchestrator to assign new replicas for the given table
+	 */
+	private String[] assignReplicas(String table_name){
+		return null;
+	}
+	
+	
+	/**
+	 * Contacts the Orchestrator to free the allocated replicas for the given table
+	 */
+	private void freeReplicas(String table_name){
+		
+	}
+	
+
 
 }
