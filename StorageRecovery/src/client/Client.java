@@ -253,8 +253,7 @@ public class Client {
             in.close();
             socket.close();
         } catch (JAXBException e) {
-			logger.error("Error unmarshling reply");
-			e.printStackTrace();
+        	logger.error("Error marshling/unmarshling", e);
 		}
 		
 		return result;
