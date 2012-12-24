@@ -107,9 +107,15 @@ public class Client {
             PMAddressMsg msg = (PMAddressMsg) jaxb_context.createUnmarshaller().unmarshal(in);	
             logger.info("Active PM Address: " + msg.msg_content);
             
-            String[] address = msg.msg_content.split(":");
-            pm_ip = address[0];
-            pm_port = Integer.parseInt(address[1]);
+            if(!msg.msg_content.equals("")){
+            	 String[] address = msg.msg_content.split(":");
+                 pm_ip = address[0];
+                 pm_port = Integer.parseInt(address[1]);
+            }else{
+            	pm_ip = null;
+            	pm_port = -1;
+            }
+           
             
             out.close();
             in.close();
