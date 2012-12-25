@@ -37,9 +37,7 @@ public class PartitionManager {
 	
 	
 	public void run(){
-		
 		heartbeat_sender.start();
-		
 		Socket socket = null;		
 		logger.info("Starting the PartitionManager({})", pm_db.node_id);
 		while(true){

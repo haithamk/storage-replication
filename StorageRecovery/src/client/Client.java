@@ -22,28 +22,30 @@ import javax.xml.xpath.XPathFactory;
 
 import messages.ClientOPMsg;
 import messages.ClientOPResult;
-import messages.Message;
 import messages.PMAddressMsg;
-import messages.ClientOPResult.ClientOPStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import debug.DebugUtility;
-
-import partitionManager.PartitionManager;
-import utilities.NoCloseOutputStream;
 
 public class Client {
-	
+
+	//=========================================================================
+	//================		Members of the class				===============
+	//=========================================================================
+		
 	static final Logger logger = LoggerFactory.getLogger(Client.class);
 	String orch_ip = null;
 	int orch_port = -1;
 	String pm_ip = null;
 	int pm_port = -1;
 
+	
+	//=========================================================================
+	//====================		Public Methods				===================
+	//=========================================================================
 	public Client(String node_id, String config_file){
 		logger.info("Starting Client with parameters node_id= " + node_id + " config_file= " + config_file);
 		try {
@@ -52,7 +54,10 @@ public class Client {
 			e.printStackTrace();
 		}
 		printManual();
-		
+	}
+	
+	
+	public void run(){
 		Scanner scanner = new Scanner( System.in );
 		while(true){
 			String str = scanner.nextLine();
@@ -65,8 +70,9 @@ public class Client {
 	}
 	
 	
-	
-	
+	//=========================================================================
+	//================			Auxiliary Methods				===============
+	//=========================================================================
 	
 	private void executeCommand(String str){
 		String[] cmds = str.split(" ");

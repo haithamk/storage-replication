@@ -40,6 +40,7 @@ public class StorageRecoveryMain {
 			//TODO
 		}else if(type.equals("Client")){
 			Client client = new Client(node_id, config_file);
+			client.run();
 		}else{
 			logger.error("Unkown type!");
 		}
