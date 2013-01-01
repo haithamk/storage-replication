@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import utilities.NoCloseInputStream;
 
 import messages.ClientOPMsg;
+import messages.DataNodesAddresses;
 import messages.LogMessage;
 import messages.ClientOPMsg.OperationType;
 import messages.ClientOPResult;
@@ -158,11 +159,13 @@ public class PMMessageHandler implements Runnable {
 		LogMessage log_message = new LogMessage();
 		log_message.table_name = msg.table_name;
 		
-		String master_replica = getMasterReplica();
+		
 		
 		if(msg.type == OperationType.CREATE_TABLE){
-			String[] replicas = assignReplicas(msg.table_name);
-			log_message.replicas = replicas;
+			DataNodesAddresses replicas = assignReplicas(msg.table_name);
+			
+			log_message.replicas = replicas.addresses;
+			//TODO check ^^ for correctness
 		}else if(msg.type == OperationType.DROP_TABLE){
 			freeReplicas(msg.table_name);
 			log_message.operation = "DROP";
@@ -177,6 +180,8 @@ public class PMMessageHandler implements Runnable {
 			logger.warn("Partition manager recieved unknown message type: {}", msg.type);
 		}
 		
+		
+		String master_replica = getMasterReplica(log_message.table_name);
 		return sendLogMessage(master_replica, log_message);
 	}
 	
@@ -228,7 +233,7 @@ public class PMMessageHandler implements Runnable {
 	/**
 	 * Returns the master replica of the given table 
 	 */
-	private String getMasterReplica(){
+	private String getMasterReplica(String table_name){
 		//TODO
 		return "";
 	}
@@ -237,8 +242,36 @@ public class PMMessageHandler implements Runnable {
 	/**
 	 * Contacts the Orchestrator to assign new replicas for the given table
 	 */
-	private String[] assignReplicas(String table_name){
-		return null;
+	private DataNodesAddresses assignReplicas(String table_name){
+		//TODO check
+		Socket socket = null;
+		PrintWriter out = null;
+        BufferedReader in = null;
+        DataNodesAddresses result = null;
+ 
+        try {    
+            socket = new Socket(pm_db.orch_ip, pm_db.orch_port);
+            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            //Sending request
+            out.println(MessageType.GET_TABLE_REPLICAS);
+            out.println(table_name);
+            
+            
+            JAXBContext jaxb_context = JAXBContext.newInstance(DataNodesAddresses.class);
+            result = (DataNodesAddresses) jaxb_context.createUnmarshaller().unmarshal(in);	
+
+            out.close();
+            in.close();
+            socket.close();
+        } catch (JAXBException e) {
+        	logger.error("Error marshling/unmarshling", e);
+		} catch (IOException e) {
+			logger.error("Error with communication", e);
+		}
+		
+		return result;
 	}
 	
 	
@@ -246,7 +279,32 @@ public class PMMessageHandler implements Runnable {
 	 * Contacts the Orchestrator to free the allocated replicas for the given table
 	 */
 	private void freeReplicas(String table_name){
-		
+		Socket socket = null;
+		PrintWriter out = null;
+        BufferedReader in = null;
+ 
+        try {    
+            socket = new Socket(pm_db.orch_ip, pm_db.orch_port);
+            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            //Sending request
+            out.println(MessageType.FREE_REPLICAS);
+            out.println(table_name);
+            
+            
+            //TODO implement
+            JAXBContext jaxb_context = JAXBContext.newInstance(DataNodesAddresses.class);
+//            result = (DataNodesAddresses) jaxb_context.createUnmarshaller().unmarshal(in);	
+
+            out.close();
+            in.close();
+            socket.close();
+        } catch (JAXBException e) {
+        	logger.error("Error marshling/unmarshling", e);
+		} catch (IOException e) {
+			logger.error("Error with communication", e);
+		}
 	}
 	
 
