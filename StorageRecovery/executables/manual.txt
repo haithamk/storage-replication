@@ -1,0 +1,11 @@
+Welcome To the Storage Recovery Application
+=====================================================
+You can use the following commands:
+
+GETPM								gets the current active partition manager from the Orchestrator
+CREATE	(Table Name)				Creates new table
+DROP	(Table Name)				Drops the specified table
+STORE	(Table Name) (Key) (Value)	Stores value at the table
+READ	(Table Name) (Key)			Returns the values stored at the specified location
+DELETE	(Table Name) (Key)			Deletes the value stored at the specified location
+
