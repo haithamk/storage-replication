@@ -8,6 +8,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import messages.LogMessage;
+import messages.LogMessage.OperationType;
 import messages.LogResult;
 import messages.LogResult.Status;
 
@@ -55,6 +57,47 @@ public class DNMessageHandler implements Runnable {
 		} catch (JAXBException e) {
 			logger.error("Jaxb error occurred while handling message", e);
 		}
+	}
+	
+	
+	
+	
+	private LogResult logOperation(LogMessage log_message){
+		LogResult result = new LogResult();
+		
+		if( (++log_message.count) < log_message.replicas.length){
+			//TODO forward the request to the next replica
+		}
+		
+		if(log_message.operation == OperationType.CREATE_TABLE){
+			
+		}else if(log_message.operation == OperationType.DROP_TABLE){
+			
+		}else if(log_message.operation == OperationType.DELETE){
+			
+		}else if(log_message.operation == OperationType.STORE){
+			
+		}
+		
+		return result;
+	}
+	
+	
+	private void createTable(String table_name){
+		
+	}
+	
+	
+	private void dropTable(String table_name){
+		
+	}
+	
+	private void delete(String table_name, String key){
+		
+	}
+	
+	private void store(String table_name, String key, String value){
+		
 	}
 
 }

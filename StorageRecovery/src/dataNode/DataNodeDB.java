@@ -25,6 +25,7 @@ public class DataNodeDB {
 	public String orch_ip;
 	public int orch_port;
 	public int heartbeat_rate;
+	public String work_dir;
 
 	
 	public DataNodeDB(String id, String config_file) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException{
@@ -58,5 +59,8 @@ public class DataNodeDB {
 		dummy_str = xpath.compile("//General/heartbeat-rate").evaluate(doc);
 		heartbeat_rate = Integer.parseInt(dummy_str);
 		logger.info("Heart beat rate: {}", heartbeat_rate);
+		
+		
+		work_dir =  "F:/Test/DN/" + id + "/";
 	}
 }
