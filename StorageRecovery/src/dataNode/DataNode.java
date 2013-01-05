@@ -45,6 +45,8 @@ public class DataNode {
 				logger.debug("New socket recieved");
 				//Execute method is NOT blocking function. The Job is saved and when
 				//There are available thread it will handle it.
+				DNMessageHandler msg_handler = new DNMessageHandler(socket, dn_db);
+				msg_handler.run();
 			} catch (IOException e) {
 				logger.error("An error occurred while running PartitionManager(" + node_id + ")", e);
 			}
