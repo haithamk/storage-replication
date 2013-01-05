@@ -11,7 +11,8 @@ public abstract class Message {
 		CLIENT_OP_RESULT,
 		GET_TABLE_REPLICAS,
 		FREE_REPLICAS,
-		LOG_OPERATION
+		LOG_OPERATION,
+		RECOVER
 	};
 	
 	
