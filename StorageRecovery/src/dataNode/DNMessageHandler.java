@@ -69,8 +69,10 @@ public class DNMessageHandler implements Runnable {
 			//TODO forward the request to the next replica
 		}
 		
+		String file_path = dn_db.work_dir + log_message.table_name + ".xml";
+		
 		if(log_message.operation == OperationType.CREATE_TABLE){
-			
+			createTable(file_path);
 		}else if(log_message.operation == OperationType.DROP_TABLE){
 			
 		}else if(log_message.operation == OperationType.DELETE){
@@ -83,21 +85,21 @@ public class DNMessageHandler implements Runnable {
 	}
 	
 	
-	private void createTable(String table_name){
-		
+	private void createTable(String file_path){
+		XMLUtility.createFile(file_path);
 	}
 	
 	
-	private void dropTable(String table_name){
-		
+	private void dropTable(String file_path){
+		XMLUtility.deleteFile(file_path);
 	}
 	
-	private void delete(String table_name, String key){
-		
+	private void delete(String file_path, String key){
+		XMLUtility.addDeleteOperation(file_path, key);
 	}
 	
-	private void store(String table_name, String key, String value){
-		
+	private void store(String file_path, String key, String value){
+		XMLUtility.addStoreOperation(file_path, key, value);
 	}
 
 }

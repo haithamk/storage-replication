@@ -39,6 +39,12 @@ public class XMLUtility {
 	}
 	
 	
+	
+	public static void deleteFile(String file_path){
+		File f = new File(file_path);
+		f.delete();
+	}
+	
 	public static void addStoreOperation(String file_path, String key, String value){
 		addEntry(file_path, "STORE", key, value);
 	}
