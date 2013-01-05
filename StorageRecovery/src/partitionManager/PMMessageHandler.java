@@ -170,6 +170,8 @@ public class PMMessageHandler implements Runnable {
 				return log_result;
 			}
 			log_message.replicas = replicas.addresses;
+			pm_db.master_replicas.put(msg.table_name, replicas.addresses[0]);
+			
 		}else if(msg.type == OperationType.DROP_TABLE){
 			freeReplicas(msg.table_name);
 			log_message.operation = "DROP";
@@ -210,7 +212,7 @@ public class PMMessageHandler implements Runnable {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
             out.print(MessageType.LOG_OPERATION + "\n");
-            JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
+            JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.marshal( log_message, out );
@@ -238,8 +240,11 @@ public class PMMessageHandler implements Runnable {
 	 * Returns the master replica of the given table 
 	 */
 	private String getMasterReplica(String table_name){
-		//TODO
-		return "";
+		String address = pm_db.master_replicas.get(table_name);
+		if(address == null){
+			//TODO get the master address from the Orchestrator
+		}
+		return address;
 	}
 	
 	
@@ -247,7 +252,6 @@ public class PMMessageHandler implements Runnable {
 	 * Contacts the Orchestrator to assign new replicas for the given table
 	 */
 	private DataNodesAddresses assignReplicas(String table_name){
-		//TODO check
 		Socket socket = null;
 		PrintWriter out = null;
         BufferedReader in = null;

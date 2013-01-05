@@ -28,7 +28,8 @@ public class PartitionManagerDB {
 	
 	static final Logger logger = LoggerFactory.getLogger(PartitionManagerDB.class);
 	public String node_id;
-	private Hashtable<String, Table> tables;	
+	private Hashtable<String, Table> tables;
+	public Hashtable<String, String> master_replicas;
 	public int port;
 	public String orch_ip;
 	public int orch_port;
@@ -44,6 +45,7 @@ public class PartitionManagerDB {
 		initConfig(config_file);
 		//Init DB variables
 		tables = new Hashtable<String, Table>();
+		master_replicas = new Hashtable<String, String>();
 	}
 	
 	
