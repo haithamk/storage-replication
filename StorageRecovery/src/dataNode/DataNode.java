@@ -15,6 +15,7 @@ public class DataNode {
 	static final Logger logger = LoggerFactory.getLogger(DataNode.class);
 	private HeartbeatSender heartbeat_sender;
 	private ServerSocket comm_socket;
+	private DataNodeDB dn_db;
 	
 	String node_id = "";
 	
@@ -22,8 +23,9 @@ public class DataNode {
 		try {
 			logger.info("Initalizing DataNode({})", node_id);
 			//TODO init
-			heartbeat_sender = new HeartbeatSender(node_id, -1, "", -1);
-			comm_socket = new ServerSocket(-1);
+			dn_db = new DataNodeDB(node_id, config_file);
+			heartbeat_sender = new HeartbeatSender(node_id, dn_db.heartbeat_rate, dn_db.orch_ip, dn_db.orch_port);
+			comm_socket = new ServerSocket(dn_db.port);
 			logger.info("DataNode({}) initalized successfully", node_id);
 		} catch (Exception e) {
 			logger.error("An error occurred while initalizing DataNode(" + node_id + ")", e);

@@ -25,4 +25,20 @@
 		
 	</PartitionManagers>
 	
+	<DataNodes>
+	    <DataNode id="100">
+	        <ip>127.0.0.1</ip>
+	        <port>43100</port>
+	    </DataNode>
+	     <DataNode id="101">
+	        <ip>127.0.0.1</ip>
+	        <port>43101</port>
+	    </DataNode>
+	     <DataNode id="102">
+	        <ip>127.0.0.1</ip>
+	        <port>43102</port>
+	    </DataNode>
+	</DataNodes>
+	
+	
 </config>

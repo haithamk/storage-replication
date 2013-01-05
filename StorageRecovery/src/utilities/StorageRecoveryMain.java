@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import client.Client;
+import dataNode.DataNode;
 
 
 public class StorageRecoveryMain {
@@ -37,7 +38,8 @@ public class StorageRecoveryMain {
 			PartitionManager part_man = new PartitionManager(node_id, config_file);
 			part_man.run();
 		}else if(type.equals("DataNode")){
-			//TODO
+			DataNode data_node = new DataNode(node_id, config_file);
+			data_node.run();
 		}else if(type.equals("Client")){
 			Client client = new Client(node_id, config_file);
 			client.run();
