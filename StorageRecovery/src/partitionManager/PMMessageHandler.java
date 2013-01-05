@@ -120,11 +120,14 @@ public class PMMessageHandler implements Runnable {
 		ClientOPResult result = new ClientOPResult();			
 		try{	
 			
-			LogResult log_result = logOperation(msg); 
-			if(log_result.status != Status.SUCCESS){
-				result.status = ClientOPStatus.DATA_NODE_FAIL;
-				return result;
-			}
+			if(msg.type != OperationType.READ){
+				//Read operation doesn't need to be logged in the Data Nodes
+				LogResult log_result = logOperation(msg); 
+				if(log_result.status != Status.SUCCESS){
+					result.status = ClientOPStatus.DATA_NODE_FAIL;
+					return result;
+				}
+			}			
 			
 			if(msg.type == OperationType.CREATE_TABLE){
 				pm_db.createTable(msg.table_name);
@@ -171,17 +174,19 @@ public class PMMessageHandler implements Runnable {
 			}
 			log_message.replicas = replicas.addresses;
 			pm_db.master_replicas.put(msg.table_name, replicas.addresses[0]);
-			
+			log_message.operation = LogMessage.OperationType.CREATE_TABLE;
 		}else if(msg.type == OperationType.DROP_TABLE){
 			freeReplicas(msg.table_name);
-			log_message.operation = "DROP";
+			log_message.operation = LogMessage.OperationType.DROP_TABLE;
 		}else if(msg.type == OperationType.STORE){
 			log_message.key = msg.key;
 			log_message.value = msg.value;
-		}else if(msg.type == OperationType.READ){
-			log_message.key = msg.key;
+			log_message.operation = LogMessage.OperationType.STORE;
 		}else if(msg.type == OperationType.DELETE){
 			log_message.key = msg.key;
+			log_message.operation = LogMessage.OperationType.DELETE;
+		}else if(msg.type == OperationType.READ){
+			logger.warn("Atempting to log read operation", msg.type);
 		}else{
 			logger.warn("Partition manager recieved unknown message type: {}", msg.type);
 		}
