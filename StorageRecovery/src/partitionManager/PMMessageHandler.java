@@ -25,6 +25,7 @@ import messages.ClientOPMsg.OperationType;
 import messages.ClientOPResult;
 import messages.ClientOPResult.ClientOPStatus;
 import messages.LogResult;
+import messages.LogResult.Status;
 import messages.Message.MessageType;
 
 public class PMMessageHandler implements Runnable {
@@ -120,7 +121,7 @@ public class PMMessageHandler implements Runnable {
 		try{	
 			
 			LogResult log_result = logOperation(msg); 
-			if(!log_result.status){
+			if(log_result.status != Status.SUCCESS){
 				result.status = ClientOPStatus.DATA_NODE_FAIL;
 				return result;
 			}
@@ -159,13 +160,16 @@ public class PMMessageHandler implements Runnable {
 		LogMessage log_message = new LogMessage();
 		log_message.table_name = msg.table_name;
 		
-		
-		
 		if(msg.type == OperationType.CREATE_TABLE){
 			DataNodesAddresses replicas = assignReplicas(msg.table_name);
 			
+			if(replicas.addresses == null){
+				logger.warn("No available Data Nodes");
+				LogResult log_result = new LogResult();
+				log_result.status = Status.NO_DN_AVAILABLE;
+				return log_result;
+			}
 			log_message.replicas = replicas.addresses;
-			//TODO check ^^ for correctness
 		}else if(msg.type == OperationType.DROP_TABLE){
 			freeReplicas(msg.table_name);
 			log_message.operation = "DROP";

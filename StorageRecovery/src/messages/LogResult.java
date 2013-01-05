@@ -1,6 +1,17 @@
 package messages;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlEnum;
+
 public class LogResult extends Message {
-	public boolean status;
+	
+	@XmlEnum(String.class)
+	public enum Status{
+		SUCCESS,
+		NO_DN_AVAILABLE
+	}
+
+	@XmlElement
+	public Status status;
 
 }
