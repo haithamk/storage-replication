@@ -201,7 +201,7 @@ public class OrchestratorDB {
 			Element pm_node = (Element) pm_nodes.item(i);
 			String id = pm_node.getAttribute("id");
 			String ip = ((Element) pm_node.getElementsByTagName("ip").item(0)).getTextContent();
-			String port = ((Element)pm_node.getElementsByTagName("port").item(0)).getTextContent();
+			String port = ((Element) pm_node.getElementsByTagName("port").item(0)).getTextContent();
 			
 			NodeInfo node_info = new NodeInfo(id, NodeType.PartitionManager, ip + ":" + port);
 			nodes.put(id, node_info);
@@ -209,6 +209,17 @@ public class OrchestratorDB {
 			if(active_pm == null){
 				active_pm = node_info;
 			}
+		}
+		
+		NodeList dn_nodes = (NodeList) xpath.compile("//DataNode").evaluate(doc, XPathConstants.NODESET);
+		for(int i = 0; i < dn_nodes.getLength(); i++){
+			Element dn_node = (Element) dn_nodes.item(i);
+			String id = dn_node.getAttribute("id");
+			String ip = ((Element) dn_node.getElementsByTagName("ip").item(0)).getTextContent();
+			String port = ((Element) dn_node.getElementsByTagName("port").item(0)).getTextContent();
+			
+			NodeInfo node_info = new NodeInfo(id, NodeType.DataNode, ip + ":" + port);
+			nodes.put(id, node_info);
 		}
 	}
 	
