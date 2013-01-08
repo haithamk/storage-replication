@@ -76,6 +76,13 @@ public class PMMessageHandler implements Runnable {
 	//================			Auxiliary Methods				===============
 	//=========================================================================
 		
+	
+	private void recover(){
+		
+	}
+	
+	
+	
 	/**
 	 * Unmarshalls the Client request, executes it and returns a result to the user.
 	 */
