@@ -66,6 +66,8 @@ public class DNMessageHandler implements Runnable {
 	
 	private void recover(){
 		//TODO read the xml file and transfer it over socket to the dest
+		
+		
 	}
 	
 	
