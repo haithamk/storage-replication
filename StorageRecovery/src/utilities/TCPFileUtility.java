@@ -15,7 +15,7 @@ public class TCPFileUtility {
 	//TODO check this class
 	
 	
-	public boolean sendFile(String file_path, Socket socket){
+	public static boolean sendFile(String file_path, Socket socket){
 		boolean result = false;
 		
 		try {
@@ -35,19 +35,13 @@ public class TCPFileUtility {
 			System.out.println("EOF:" + e.getMessage());
 		} catch (IOException e) {
 			System.out.println("IO:" + e.getMessage());
-		} finally {
-			if (socket != null)
-				try {
-					socket.close();
-				} catch (IOException e) {/* close failed */
-				}
-		}
+		} 
 		
 		return result;
 	}
 	
 	
-	public boolean receiveFile(String file_path, Socket socket){
+	public static boolean receiveFile(String file_path, Socket socket){
 		boolean result = false;
 
 		try {
@@ -69,13 +63,6 @@ public class TCPFileUtility {
 		} catch (IOException e) {
 			System.out.println("IO:" + e.getMessage());
 		}
-
-		finally {
-			try {
-				socket.close();
-			} catch (IOException e) {/* close failed */
-			}
-		}
 		
 		return result;
 	}
@@ -86,12 +73,12 @@ public class TCPFileUtility {
 	
 	
 	
-	private String readFile(String file_path){
+	private static String readFile(String file_path){
 		//TODO implement
 		return "";
 	}
 	
-	private void writeFile(String file_path, String content) throws IOException{
+	private static void writeFile(String file_path, String content) throws IOException{
 		FileWriter out = new FileWriter(file_path);
 		BufferedWriter bufWriter = new BufferedWriter(out);
 		bufWriter.append(content);

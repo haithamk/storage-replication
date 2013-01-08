@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import utilities.NoCloseInputStream;
+import utilities.TCPFileUtility;
 
 public class DNMessageHandler implements Runnable {
 
@@ -46,9 +47,11 @@ public class DNMessageHandler implements Runnable {
 			inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			MessageType type = MessageType.valueOf(inputReader.readLine());
 			switch (type) {
-			case LOG_OPERATION: handleLogOperation();
+			case LOG_OPERATION: 
+				handleLogOperation();
 				break;
 			case RECOVER:
+				handleRecover();
 				break;
 			default:
 				break;
@@ -64,15 +67,24 @@ public class DNMessageHandler implements Runnable {
 	
 	
 	
-	private void recover(){
+	private void handleRecover(){
 		//TODO read the xml file and transfer it over socket to the dest
-		
+		try{
+			String table_name = inputReader.readLine();
+			String file_path = dn_db.work_dir + table_name + ".xml";
+			
+			TCPFileUtility.sendFile(file_path, socket);
+			
+			socket.close();
+			logger.info("getTableReplicas result sent successfully");
+		}catch(Exception e){
+			logger.error("An error occurred in the method getTableReplicas", e);
+		}
 		
 	}
 	
 	
 	private void handleLogOperation(){
-		
 		try {
 			LogResult result = new LogResult();
 			result.status = Status.SUCCESS;
