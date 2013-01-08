@@ -12,6 +12,8 @@ import java.net.UnknownHostException;
 public class TCPFileUtility {
 
 	
+	//http://www.dreamincode.net/forums/topic/139154-transfer-a-file-over-tcp/
+	
 	//TODO check this class
 	
 	
