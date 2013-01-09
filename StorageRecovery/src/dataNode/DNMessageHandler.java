@@ -28,6 +28,7 @@ import utilities.XMLUtility;
 public class DNMessageHandler implements Runnable {
 
 	static final Logger logger = LoggerFactory.getLogger(DNMessageHandler.class);
+	
 	Socket socket;
 	DataNodeDB dn_db;
 	BufferedReader inputReader;

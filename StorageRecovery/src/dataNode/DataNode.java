@@ -12,17 +12,16 @@ import utilities.HeartbeatSender;
 
 public class DataNode {
 	
-	static final Logger logger = LoggerFactory.getLogger(DataNode.class);
-	private HeartbeatSender heartbeat_sender;
-	private ServerSocket comm_socket;
-	private DataNodeDB dn_db;
+	private static final Logger logger = LoggerFactory.getLogger(DataNode.class);
 	
-	String node_id = "";
+	private HeartbeatSender heartbeat_sender;	//Thread for sending heart beats to the Orchestrator
+	private ServerSocket comm_socket;			//The socket the server listens on to requests
+	private DataNodeDB dn_db;					//The data base for holding informations necessary for DN operating
+	private String node_id;						//The id of the node
 	
 	public DataNode(String node_id, String config_file){
 		try {
 			logger.info("Initalizing DataNode({})", node_id);
-			//TODO init
 			dn_db = new DataNodeDB(node_id, config_file);
 			heartbeat_sender = new HeartbeatSender(node_id, dn_db.heartbeat_rate, dn_db.orch_ip, dn_db.orch_port);
 			comm_socket = new ServerSocket(dn_db.port);
@@ -45,6 +44,7 @@ public class DataNode {
 				logger.debug("New socket recieved");
 				//Execute method is NOT blocking function. The Job is saved and when
 				//There are available thread it will handle it.
+				logger.debug("Data node({0}) recieved new socket", node_id);
 				DNMessageHandler msg_handler = new DNMessageHandler(socket, dn_db);
 				msg_handler.run();
 			} catch (IOException e) {

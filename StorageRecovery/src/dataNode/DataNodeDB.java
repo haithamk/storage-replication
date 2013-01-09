@@ -17,13 +17,14 @@ import org.xml.sax.SAXException;
 public class DataNodeDB {
 
 	
-	static final Logger logger = LoggerFactory.getLogger(DataNodeDB.class);
-	public String id;
-	public int port;
+	private static final Logger logger = LoggerFactory.getLogger(DataNodeDB.class);
+	
+	public String id;				//Node id	
+	public int port;				//Node operating port
 	public String orch_ip;
 	public int orch_port;
 	public int heartbeat_rate;
-	public String work_dir;
+	public String work_dir;			//Directory to save XML files
 
 	
 	public DataNodeDB(String id, String config_file) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException{
