@@ -2,7 +2,7 @@ package partitionManager;
 
 import java.io.IOException;
 import java.util.Hashtable;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,7 +28,7 @@ public class PartitionManagerDB {
 	
 	static final Logger logger = LoggerFactory.getLogger(PartitionManagerDB.class);
 	public String node_id;
-	private Hashtable<String, Table> tables;
+	private Map<String, Table> tables;	
 	public Hashtable<String, String> master_replicas;
 	public int port;
 	public String orch_ip;
@@ -44,7 +44,7 @@ public class PartitionManagerDB {
 		this.node_id = node_id;
 		initConfig(config_file);
 		//Init DB variables
-		tables = new Hashtable<String, Table>();
+		tables = new Hashtable<String, Table>(); //TODO check concurrent accesses to this data base??, ConcurrentHashMap???
 		master_replicas = new Hashtable<String, String>();
 	}
 	
@@ -60,6 +60,11 @@ public class PartitionManagerDB {
 		logger.debug("Creating table: {}", table_name);
 		Table table = new Table(table_name);
 		tables.put(table_name, table);
+	}
+	
+	
+	public void addTable(String table_name, Table table){
+		//TODO impelemnt
 	}
 	
 

@@ -21,7 +21,7 @@ public class TCPFileUtility {
 		boolean result = false;
 		
 		try {
-			String data = "Hello, How are you?";
+			String data = readFile(file_path);
 			
 			DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
@@ -77,7 +77,7 @@ public class TCPFileUtility {
 	
 	private static String readFile(String file_path){
 		//TODO implement
-		return "";
+		return "Hello, How are you?";
 	}
 	
 	private static void writeFile(String file_path, String content) throws IOException{

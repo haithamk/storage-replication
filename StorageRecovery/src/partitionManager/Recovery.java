@@ -5,6 +5,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Recovery {
 
 	
@@ -19,6 +22,7 @@ public class Recovery {
 	
 	LinkedList<TableInfo> tables_info;
 	PartitionManagerDB pm_db;
+	static final Logger logger = LoggerFactory.getLogger(Recovery.class);
 	
 	
 	
