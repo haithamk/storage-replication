@@ -13,12 +13,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public class XMLUtility {
 
+	static final Logger logger = LoggerFactory.getLogger(XMLUtility.class);
+	
 	public static void createFile(String file_path){
 		 
 		try {
@@ -54,10 +58,7 @@ public class XMLUtility {
 	}
 	
 	
-	
-	
-	private static void addEntry(String file_path, String operation, String key, String value){
-		
+	public static Document getDocument(String file_path){
 		try {
 			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance(); 
 			domFactory.setIgnoringComments(true);
@@ -65,19 +66,7 @@ public class XMLUtility {
 			builder = domFactory.newDocumentBuilder();
 			Document doc = builder.parse(new File(file_path));
 			
-			
-			Element entry_elem = doc.createElement("Entry");
-			entry_elem.setAttribute("Type", operation);
-			entry_elem.setAttribute("Key", key);
-			if(operation.equals("STORE")){
-				entry_elem.appendChild(doc.createTextNode(value));
-			}
-			
-			Element log_element = (Element) doc.getElementsByTagName("Log").item(0);
-			log_element.appendChild(entry_elem);
-			
-			saveFile(file_path, doc);
-		
+			return doc;
 			 
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -86,6 +75,29 @@ public class XMLUtility {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
+		
+		return null;
+	}
+	
+	
+	private static void addEntry(String file_path, String operation, String key, String value){
+		
+		Document doc = getDocument(file_path);
+		if(doc == null){
+			return;
+		}
+		
+		Element entry_elem = doc.createElement("Entry");
+		entry_elem.setAttribute("Type", operation);
+		entry_elem.setAttribute("Key", key);
+		if(operation.equals("STORE")){
+			entry_elem.appendChild(doc.createTextNode(value));
+		}
+		
+		Element log_element = (Element) doc.getElementsByTagName("Log").item(0);
+		log_element.appendChild(entry_elem);
+		
+		saveFile(file_path, doc);
 		
 	}
 	

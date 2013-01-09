@@ -42,8 +42,6 @@ public class DNMessageHandler implements Runnable {
 	@Override
 	public void run() {
 		try{
-			NoCloseInputStream in = new NoCloseInputStream(socket.getInputStream());
-			
 			inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			MessageType type = MessageType.valueOf(inputReader.readLine());
 			switch (type) {
