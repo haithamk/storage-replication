@@ -16,10 +16,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import dataNode.XMLUtility;
 
 import partitionManager.Recovery.TableInfo;
 import utilities.TCPFileUtility;
+import utilities.XMLUtility;
 
 public class TableBuilder implements Runnable {
 

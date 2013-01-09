@@ -1,6 +1,6 @@
 package test;
 
-import dataNode.XMLUtility;
+import utilities.XMLUtility;
 
 public class XMLUtiltiyTest {
 
