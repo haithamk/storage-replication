@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import utilities.NoCloseInputStream;
+import utilities.NoCloseOutputStream;
 
 import messages.ClientOPMsg;
 import messages.DataNodesAddresses;
@@ -220,7 +221,7 @@ public class PMMessageHandler implements Runnable {
         	String ip = log_message.replicas[0].split(":")[0];
         	int port = Integer.parseInt(log_message.replicas[0].split(":")[1]);
             socket = new Socket(ip, port);
-            out = new PrintWriter(socket.getOutputStream(), true);
+            out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
             out.print(MessageType.LOG_OPERATION + "\n");
