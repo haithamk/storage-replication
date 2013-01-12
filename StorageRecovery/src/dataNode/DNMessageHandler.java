@@ -129,7 +129,7 @@ public class DNMessageHandler implements Runnable {
 	
 	private LogResult logOperation(LogMessage log_message){
 		
-		LogResult result = null;
+		LogResult result = new LogResult();;
 		
 		if( (++log_message.count) < log_message.replicas.length){
 			logger.info("forward the request to the next replica");
@@ -154,6 +154,7 @@ public class DNMessageHandler implements Runnable {
 			store(file_path, log_message.key, log_message.value);
 		}
 		
+		result.status = Status.SUCCESS;
 		return result;
 	}
 	
