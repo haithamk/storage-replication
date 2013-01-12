@@ -46,6 +46,7 @@ public class DNMessageHandler implements Runnable {
 		try{
 			inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			MessageType type = MessageType.valueOf(inputReader.readLine());
+			logger.info("Handling message of type: {}", type.toString());
 			switch (type) {
 			case LOG_OPERATION: 
 				handleLogOperation();
