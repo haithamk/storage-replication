@@ -1,5 +1,6 @@
 package dataNode;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -9,6 +10,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -31,6 +33,10 @@ public class DataNodeDB {
 		logger.info("Initalizing DataNode DB");
 		this.id = id;
 		initConfig(config_file);
+		
+		File work_file = new File(work_dir);
+		FileUtils.deleteDirectory(work_file);
+		work_file.mkdir();
 	}
 	
 	private void initConfig(String config_file) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
@@ -61,5 +67,6 @@ public class DataNodeDB {
 		
 		//Setting the work dir to save the persistent files
 		work_dir =  xpath.compile("//DataNodes/WorkDir").evaluate(doc).trim() + id + "/";
+		
 	}
 }
