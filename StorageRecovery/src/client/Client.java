@@ -23,6 +23,7 @@ import javax.xml.xpath.XPathFactory;
 import messages.ClientOPMsg;
 import messages.ClientOPResult;
 import messages.PMAddressMsg;
+import messages.ClientOPResult.ClientOPStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,31 +142,33 @@ public class Client {
 	}
 	
 	
-	private void createTable(String table_name){
+	private boolean createTable(String table_name){
 		logger.info("creating new table: " + table_name);
 		ClientOPMsg msg = new ClientOPMsg();
 		msg.type = ClientOPMsg.OperationType.CREATE_TABLE;
 		msg.table_name = table_name;
 		ClientOPResult result = executeOperation(msg);
-		if(result == null){
-			return;
+		if(result == null || result.status != ClientOPStatus.SUCCESS){
+			return false;
 		}
 		logger.info("Creating new table completed");
+		return true;
 	}
 	
-	private void dropTable(String table_name){
+	private boolean dropTable(String table_name){
 		logger.info("Dropping table: " + table_name);
 		ClientOPMsg msg = new ClientOPMsg();
 		msg.type = ClientOPMsg.OperationType.DROP_TABLE;
 		msg.table_name = table_name;
 		ClientOPResult result = executeOperation(msg);
-		if(result == null){
-			return;
+		if(result == null || result.status != ClientOPStatus.SUCCESS){
+			return false;
 		}
 		logger.info("Dropping table completed");
+		return false;
 	}
 	
-	private void store(String table_name, String key, String value){
+	private boolean store(String table_name, String key, String value){
 		logger.info("Storing, table: " + table_name + " Key: " + key + " Value: " + value);
 		ClientOPMsg msg = new ClientOPMsg();
 		msg.type = ClientOPMsg.OperationType.STORE;
@@ -173,36 +176,39 @@ public class Client {
 		msg.key = key;
 		msg.value = value;
 		ClientOPResult result = executeOperation(msg);
-		if(result == null){
-			return;
+		if(result == null || result.status != ClientOPStatus.SUCCESS){
+			return false;
 		}
 		logger.info("Storing value completed");
+		return true;
 	}
 	
-	private void read(String table_name, String key){
+	private boolean read(String table_name, String key){
 		logger.info("Reading, table: " + table_name + " Key: " + key);
 		ClientOPMsg msg = new ClientOPMsg();
 		msg.type = ClientOPMsg.OperationType.READ;
 		msg.table_name = table_name;
 		msg.key = key;
 		ClientOPResult result = executeOperation(msg);
-		if(result == null){
-			return;
+		if(result == null || result.status != ClientOPStatus.SUCCESS){
+			return false;
 		}
 		logger.info("Reading value completed. Value = " + result.vlaue);
+		return false;
 	}
 	
-	private void delete(String table_name, String key){
+	private boolean delete(String table_name, String key){
 		logger.info("Deleting, table: " + table_name + " Key: " + key);
 		ClientOPMsg msg = new ClientOPMsg();
 		msg.type = ClientOPMsg.OperationType.DELETE;
 		msg.table_name = table_name;
 		msg.key = key;
 		ClientOPResult result = executeOperation(msg);
-		if(result == null){
-			return;
+		if(result == null || result.status != ClientOPStatus.SUCCESS){
+			return false;
 		}
 		logger.info("Deleting value completed");
+		return true;
 	}
 	
 	

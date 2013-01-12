@@ -59,7 +59,7 @@ public class DataNodeDB {
 		heartbeat_rate = Integer.parseInt(dummy_str);
 		logger.info("Heart beat rate: {}", heartbeat_rate);
 		
-		
-		work_dir =  "F:/Test/DN/" + id + "/";
+		//Setting the work dir to save the persistent files
+		work_dir =  xpath.compile("//DataNodes/WorkDir").evaluate(doc) + id + "/";
 	}
 }

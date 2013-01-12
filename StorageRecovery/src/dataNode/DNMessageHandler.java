@@ -66,13 +66,17 @@ public class DNMessageHandler implements Runnable {
 	
 	
 	
-	
+	/**
+	 * Reads the XML file of the requested table and transfers it over socket to
+	 * the destination
+	 */
 	private void handleRecover(){
-		//TODO read the xml file and transfer it over socket to the dest
 		try{
 			String table_name = inputReader.readLine();
 			String file_path = dn_db.work_dir + table_name + ".xml";
+			logger.info("Handling recover request for table: {} ", table_name); 
 			
+			//Send the given file over the socket
 			TCPFileUtility.sendFile(file_path, socket);
 			
 			socket.close();
@@ -84,22 +88,25 @@ public class DNMessageHandler implements Runnable {
 	}
 	
 	
+	/**
+	 * Logs an operation to the persistent disk
+	 */
 	private void handleLogOperation(){
 		try {
-			LogResult result = new LogResult();
-			result.status = Status.SUCCESS;
+			LogResult result = null;
 			
 			NoCloseInputStream in = new NoCloseInputStream(socket.getInputStream());
 			JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			LogMessage log_msg = (LogMessage) jaxb_context.createUnmarshaller().unmarshal(in);			
 			
-			
+			//Log operation in persistent disk
 			result = logOperation(log_msg);
 			
 			//Creating marshaler
 			jaxb_context = JAXBContext.newInstance(LogResult.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			
 			//Sending the result
 			OutputStream out = socket.getOutputStream();
 			m.marshal( result, out );
