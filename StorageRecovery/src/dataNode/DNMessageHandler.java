@@ -129,14 +129,16 @@ public class DNMessageHandler implements Runnable {
 		LogResult result = null;
 		
 		if( (++log_message.count) < log_message.replicas.length){
-			//TODO forward the request to the next replica
+			logger.info("forward the request to the next replica");
 			LogResult forward_result = forwardRequest(log_message);
 			if(forward_result.status != Status.SUCCESS){
-				//TODO handle failure
+				logger.warn("Error in forwarding the request to the next replica");
 				return forward_result;
 			}
+			logger.info("Request forwarded to the next replica successfully");
 		}
 		
+		logger.info("Logging the message locally");
 		String file_path = dn_db.work_dir + log_message.table_name + ".xml";
 		
 		if(log_message.operation == OperationType.CREATE_TABLE){
@@ -163,10 +165,12 @@ public class DNMessageHandler implements Runnable {
         	String address = log_message.replicas[log_message.count];
         	String ip = address.split(":")[0];
         	int port = Integer.parseInt(address.split(":")[1]);
+        	logger.info("Forwarding request to {}:{}", ip, port);
             socket = new Socket(ip, port);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
+            logger.info("Sending..");
             out.print(MessageType.LOG_OPERATION + "\n");
             JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
@@ -174,9 +178,11 @@ public class DNMessageHandler implements Runnable {
 			m.marshal( log_message, out );
 			socket.shutdownOutput(); //To send EOF
 			
+			logger.info("Waiting for response");
             jaxb_context = JAXBContext.newInstance(LogResult.class);
             result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(in);	
-
+            logger.info("Response received");
+            
             out.close();
             in.close();
             socket.close();
@@ -193,19 +199,23 @@ public class DNMessageHandler implements Runnable {
 	
 	
 	private void createTable(String file_path){
+		logger.info("Logging create table operation");
 		XMLUtility.createFile(file_path);
 	}
 	
 	
 	private void dropTable(String file_path){
+		logger.info("Logging drop table operation");
 		XMLUtility.deleteFile(file_path);
 	}
 	
 	private void delete(String file_path, String key){
+		logger.info("Logging delete table operation");
 		XMLUtility.addDeleteOperation(file_path, key);
 	}
 	
 	private void store(String file_path, String key, String value){
+		logger.info("Logging store table operation");
 		XMLUtility.addStoreOperation(file_path, key, value);
 	}
 

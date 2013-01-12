@@ -84,6 +84,7 @@ public class OrchestratorDB {
 	public int time_out;
 	public int refresh_rate;
 	public String id;
+	public Hashtable<String, String[]> tables_replicas;
 	
 	
 	//=========================================================================
@@ -94,6 +95,7 @@ public class OrchestratorDB {
 		logger.info("Initalizing Orchestrator DB");
 		this.id = id;
 		initConfig(config_file);
+		tables_replicas = new Hashtable<String, String[]>();
 	}
 	
 	
@@ -156,6 +158,8 @@ public class OrchestratorDB {
 			}
 		}
 		
+		tables_replicas.put(table_name, replicas);
+		
 		return replicas;
 	}
 	
@@ -165,6 +169,9 @@ public class OrchestratorDB {
 	//================			Auxiliary Methods				===============
 	//=========================================================================
 			
+	/**
+	 * Initializes the configuration from the xml file
+	 */
 	private void initConfig(String config_file) throws ParserConfigurationException, XPathExpressionException, SAXException, IOException{
 		//Loading XML document
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -191,6 +198,10 @@ public class OrchestratorDB {
 	}
 	
 	
+	
+	/**
+	 * Initializes the nodes details from the config files
+	 */
 	private void initNodes(Document doc) throws XPathExpressionException{
 		nodes = new Hashtable<String, NodeInfo>();
 		XPathFactory xpathFactory = XPathFactory.newInstance();

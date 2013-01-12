@@ -29,7 +29,7 @@ public class PartitionManagerDB {
 	static final Logger logger = LoggerFactory.getLogger(PartitionManagerDB.class);
 	public String node_id;
 	private Map<String, Table> tables;	
-	public Hashtable<String, String> master_replicas;
+	public Hashtable<String, String[]> replicas;
 	public int port;
 	public String orch_ip;
 	public int orch_port;
@@ -45,7 +45,7 @@ public class PartitionManagerDB {
 		initConfig(config_file);
 		//Init DB variables
 		tables = new Hashtable<String, Table>(); //TODO check concurrent accesses to this data base??, ConcurrentHashMap???
-		master_replicas = new Hashtable<String, String>();
+		replicas = new Hashtable<String, String[]>();
 	}
 	
 	
@@ -59,12 +59,14 @@ public class PartitionManagerDB {
 	public void createTable(String table_name){
 		logger.debug("Creating table: {}", table_name);
 		Table table = new Table(table_name);
-		tables.put(table_name, table);
+		//tables.put(table_name, table);
+		addTable(table_name, table);
 	}
 	
 	
 	public void addTable(String table_name, Table table){
-		//TODO impelemnt
+		//TODO implement, check concurency issues
+		tables.put(table_name, table);
 	}
 	
 

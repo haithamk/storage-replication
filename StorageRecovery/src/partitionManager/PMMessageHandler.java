@@ -180,7 +180,7 @@ public class PMMessageHandler implements Runnable {
 				return log_result;
 			}
 			log_message.replicas = replicas.addresses;
-			pm_db.master_replicas.put(msg.table_name, replicas.addresses[0]);
+			pm_db.replicas.put(msg.table_name, replicas.addresses);
 			log_message.operation = LogMessage.OperationType.CREATE_TABLE;
 		}else if(msg.type == OperationType.DROP_TABLE){
 			freeReplicas(msg.table_name);
@@ -199,8 +199,8 @@ public class PMMessageHandler implements Runnable {
 		}
 		
 		
-		String master_replica = getMasterReplica(log_message.table_name);
-		return sendLogMessage(master_replica, log_message);
+		log_message.replicas = getReplicas(log_message.table_name);
+		return sendLogMessage(log_message);
 	}
 	
 	
@@ -210,15 +210,15 @@ public class PMMessageHandler implements Runnable {
 	 * result recieved from the remote node. Or an empty result with the error
 	 * code if an error occurs
 	 */
-	private LogResult sendLogMessage(String address, LogMessage log_message){
+	private LogResult sendLogMessage(LogMessage log_message){
 		Socket socket = null;
 		PrintWriter out = null;
         BufferedReader in = null;
         LogResult result = null;
         
         try {   
-        	String ip = address.split(":")[0];
-        	int port = Integer.parseInt(address.split(":")[1]);
+        	String ip = log_message.replicas[0].split(":")[0];
+        	int port = Integer.parseInt(log_message.replicas[0].split(":")[1]);
             socket = new Socket(ip, port);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -251,12 +251,12 @@ public class PMMessageHandler implements Runnable {
 	/**
 	 * Returns the master replica of the given table 
 	 */
-	private String getMasterReplica(String table_name){
-		String address = pm_db.master_replicas.get(table_name);
-		if(address == null){
+	private String[] getReplicas(String table_name){
+		String[] replicas = pm_db.replicas.get(table_name);
+		if(replicas == null){
 			//TODO get the master address from the Orchestrator
 		}
-		return address;
+		return replicas;
 	}
 	
 	
