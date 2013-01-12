@@ -21,6 +21,8 @@ import messages.Message.MessageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import debug.DebugUtility;
+
 import utilities.NoCloseInputStream;
 import utilities.TCPFileUtility;
 import utilities.XMLUtility;
@@ -96,9 +98,10 @@ public class DNMessageHandler implements Runnable {
 		try {
 			LogResult result = null;
 			
-			NoCloseInputStream in = new NoCloseInputStream(socket.getInputStream());
+//			DebugUtility.printSocket(socket);
+			
 			JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
-			LogMessage log_msg = (LogMessage) jaxb_context.createUnmarshaller().unmarshal(in);			
+			LogMessage log_msg = (LogMessage) jaxb_context.createUnmarshaller().unmarshal(inputReader);			
 			
 			//Log operation in persistent disk
 			result = logOperation(log_msg);
