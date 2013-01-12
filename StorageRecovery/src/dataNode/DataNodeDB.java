@@ -60,6 +60,6 @@ public class DataNodeDB {
 		logger.info("Heart beat rate: {}", heartbeat_rate);
 		
 		//Setting the work dir to save the persistent files
-		work_dir =  xpath.compile("//DataNodes/WorkDir").evaluate(doc) + id + "/";
+		work_dir =  xpath.compile("//DataNodes/WorkDir").evaluate(doc).trim() + id + "/";
 	}
 }
