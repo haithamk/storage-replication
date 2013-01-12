@@ -26,6 +26,9 @@
 	</PartitionManagers>
 	
 	<DataNodes>
+	    <WorkDir>
+	        F:/Test/DN/
+	    </WorkDir>
 	    <DataNode id="100">
 	        <ip>127.0.0.1</ip>
 	        <port>43100</port>
