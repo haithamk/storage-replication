@@ -100,6 +100,9 @@ public class DNMessageHandler implements Runnable {
 			
 //			DebugUtility.printSocket(socket);
 			
+			System.out.println("1");
+			System.out.println("2");
+			System.out.println("3");
 			JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			LogMessage log_msg = (LogMessage) jaxb_context.createUnmarshaller().unmarshal(inputReader);			
 			
