@@ -269,10 +269,8 @@ public class PMMessageHandler implements Runnable {
 			logger.error("Error communicating with the remote node", e);
 		} catch (XMLStreamException e) {
 			logger.error("Error in the XML reader/writer", e);
-			e.printStackTrace();
 		} catch (FactoryConfigurationError e) {
 			logger.error("Error in the XML reader/writer", e);
-			e.printStackTrace();
 		}
 		
 		return result;
