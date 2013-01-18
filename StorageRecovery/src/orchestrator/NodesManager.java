@@ -105,9 +105,14 @@ public class NodesManager extends Thread {
 			for(int i = 0; i < nodes.length; i++){
 				NodeInfo node = nodes[i];
 				if(node == dead_node){
-					NodeInfo new_node = assignNewReplica(table_name, dead_node);
+					NodeInfo new_node = assignNewReplica(table_name, nodes);
 					recover_dn_message.table_names.add(table_name);
 					recover_dn_message.table_names.add(new_node.address);
+					for(int j = 0; j < nodes.length; j++){
+						if(nodes[j] == dead_node){
+							nodes[j] = new_node;
+						}
+					}
 					break;
 				}
 			}
@@ -124,8 +129,6 @@ public class NodesManager extends Thread {
 		
 		Socket socket = null;
 		PrintWriter out = null;
-        LogResult result = null;
-        
         try {   
         	
         	//Create socket to the DN
@@ -167,9 +170,34 @@ public class NodesManager extends Thread {
 		}
 	}
 	
-	private NodeInfo assignNewReplica(String table_name, NodeInfo dead_node){
+	private NodeInfo assignNewReplica(String table_name, NodeInfo[] assigned_nodes){
 		NodeInfo new_node = null;
-		//TODO implement
+		int min_tables = 0;
+		Set<NodeInfo> nodes = orch_db.replicas_per_node.keySet();
+		Iterator<NodeInfo> node_itr = nodes.iterator();
+		while(node_itr.hasNext()){
+			NodeInfo node = node_itr.next();
+			boolean already_assigned = false;
+			for(int i = 0; i < assigned_nodes.length; i++){
+				if(assigned_nodes[i] == node){
+					already_assigned = true;
+					break;
+				}
+			}
+			
+			int tables_num = orch_db.replicas_per_node.get(node);
+			if(tables_num < min_tables && !already_assigned){
+				new_node = node;
+				min_tables = tables_num;
+			}
+			
+		}
+		
+		if(new_node != null){
+			orch_db.replicas_per_node.put(new_node, ++min_tables);
+		}
+		
+		
 		return new_node;
 	}
 	
