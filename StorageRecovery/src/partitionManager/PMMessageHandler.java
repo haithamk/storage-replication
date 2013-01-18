@@ -8,10 +8,18 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.LinkedList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -180,7 +188,11 @@ public class PMMessageHandler implements Runnable {
 				log_result.status = Status.NO_DN_AVAILABLE;
 				return log_result;
 			}
-			log_message.replicas = replicas.addresses;
+			
+			java.util.Arrays.sort(replicas.addresses);
+			String arr[] = {replicas.addresses[0], replicas.addresses[0]};
+			//log_message.replicas = replicas.addresses;
+			log_message.replicas = arr;
 			pm_db.replicas.put(msg.table_name, replicas.addresses);
 			log_message.operation = LogMessage.OperationType.CREATE_TABLE;
 		}else if(msg.type == OperationType.DROP_TABLE){
@@ -214,28 +226,40 @@ public class PMMessageHandler implements Runnable {
 	private LogResult sendLogMessage(LogMessage log_message){
 		Socket socket = null;
 		PrintWriter out = null;
-        BufferedReader in = null;
         LogResult result = null;
         
         try {   
+        	
+        	//Create socket to the DN
         	String ip = log_message.replicas[0].split(":")[0];
         	int port = Integer.parseInt(log_message.replicas[0].split(":")[1]);
             socket = new Socket(ip, port);
-            out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
+            //Init input/output streams
+            out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
+			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
+            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
+            
+            //Send operation type
             out.print(MessageType.LOG_OPERATION + "\n");
+            out.flush();
+            
+            //Send log message
             JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			m.marshal( log_message, out );
-			socket.shutdownOutput(); //To send EOF
-			
-            jaxb_context = JAXBContext.newInstance(LogResult.class);
-            result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(in);	
+			m.setProperty(Marshaller.JAXB_FRAGMENT,true);
+			m.marshal(log_message,xsw);
+	        xsw.flush();    // send it now
 
+	        //get response
+            jaxb_context = JAXBContext.newInstance(LogResult.class);
+            result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(xer);	
+
+            //Close connection
+            xsw.close();
+            xer.close();
             out.close();
-            in.close();
             socket.close();
         } catch (JAXBException e) {
 			logger.error("Error marshling/unmarshling", e);
@@ -243,6 +267,12 @@ public class PMMessageHandler implements Runnable {
 			logger.error("Error communicating with the remote node", e);
 		} catch (IOException e) {
 			logger.error("Error communicating with the remote node", e);
+		} catch (XMLStreamException e) {
+			logger.error("Error in the XML reader/writer", e);
+			e.printStackTrace();
+		} catch (FactoryConfigurationError e) {
+			logger.error("Error in the XML reader/writer", e);
+			e.printStackTrace();
 		}
 		
 		return result;
