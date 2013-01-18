@@ -1,12 +1,9 @@
 package dataNode;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -26,14 +23,9 @@ import messages.LogResult;
 import messages.LogResult.Status;
 import messages.Message.MessageType;
 
-import org.apache.commons.io.input.CloseShieldInputStream;
-import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import debug.DebugUtility;
-
-import utilities.NoCloseInputStream;
 import utilities.TCPUtility;
 import utilities.XMLUtility;
 
@@ -137,12 +129,11 @@ public class DNMessageHandler implements Runnable {
 			socket.close();
 			logger.info("Handling request completed successfully");	
 		} catch (JAXBException e) {
-			e.printStackTrace();
+			logger.error("Error marshling/unmarshling", e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IO Error", e);
 		} catch (XMLStreamException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error in the XML reader/writer", e);
 		}			
 		
 	}
