@@ -84,7 +84,8 @@ public class OrchestratorDB {
 	public int time_out;
 	public int refresh_rate;
 	public String id;
-	public Hashtable<String, String[]> tables_replicas;
+	public Hashtable<String, NodeInfo[]> tables_replicas;
+	public Hashtable<NodeInfo, Integer> replicas_per_node;
 	
 	
 	//=========================================================================
@@ -95,7 +96,8 @@ public class OrchestratorDB {
 		logger.info("Initalizing Orchestrator DB");
 		this.id = id;
 		initConfig(config_file);
-		tables_replicas = new Hashtable<String, String[]>();
+		tables_replicas = new Hashtable<String, NodeInfo[]>();
+		replicas_per_node = new Hashtable<OrchestratorDB.NodeInfo, Integer>();
 	}
 	
 	
@@ -146,6 +148,7 @@ public class OrchestratorDB {
 		//The proper implementation chooses the replicas carefully to distribute the tables evenly among the data nodes
 		logger.info("Assigning replicas for {}", table_name);
 		String replicas[] = new String[3];
+		NodeInfo[] replicas_node_info = new NodeInfo[3];
 		Set<String> nodes_ids = nodes.keySet();
 		Iterator<String> id_it = nodes_ids.iterator();
 		int num = 0;
@@ -154,11 +157,14 @@ public class OrchestratorDB {
 			NodeInfo node = nodes.get(id);
 			if(node.isAlive() && node.type == NodeType.DataNode){
 				logger.info("Assigned node: {} for replica: {} ", id, table_name);
+				replicas_node_info[num] = node;
 				replicas[num++] = node.address;
+				Integer replicas_num = replicas_per_node.get(node);
+				replicas_per_node.put(node, replicas_num++);
 			}
 		}
 		
-		tables_replicas.put(table_name, replicas);
+		tables_replicas.put(table_name, replicas_node_info);
 		
 		return replicas;
 	}
@@ -231,6 +237,7 @@ public class OrchestratorDB {
 			
 			NodeInfo node_info = new NodeInfo(id, NodeType.DataNode, ip + ":" + port);
 			nodes.put(id, node_info);
+			replicas_per_node.put(node_info, 0);
 		}
 	}
 	

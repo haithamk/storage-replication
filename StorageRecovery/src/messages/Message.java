@@ -12,7 +12,8 @@ public abstract class Message {
 		GET_TABLE_REPLICAS,
 		FREE_REPLICAS,
 		LOG_OPERATION,
-		RECOVER
+		RECOVER,
+		RECOVER_DN_MESSAGE
 	};
 	
 	

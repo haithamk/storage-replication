@@ -1,13 +1,33 @@
 package orchestrator;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import messages.LogMessage;
+import messages.LogResult;
+import messages.RecoverDNMessage;
+import messages.Message.MessageType;
 import orchestrator.OrchestratorDB.NodeInfo;
 import orchestrator.OrchestratorDB.NodeInfo.NodeType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import utilities.NoCloseOutputStream;
 
 public class NodesManager extends Thread {
 
@@ -58,7 +78,6 @@ public class NodesManager extends Thread {
 	
 	
 	private void handleAliveNode(NodeInfo node_info){
-		
 	}
 	
 	private void handleDeadNode(NodeInfo dead_node_info){
@@ -68,9 +87,91 @@ public class NodesManager extends Thread {
 		if(dead_node_info.id.equals(orch_db.active_pm.id)){
 			logger.info("Current Partition Manager({}) is dead. Electing new Partition Manager", dead_node_info.id);
 			new_pm_needed = true;
+		}else if(dead_node_info.type == NodeType.DataNode){
+			handleDeadDNNode(dead_node_info);
 		}
 	}
 	
+	
+	private void handleDeadDNNode(NodeInfo dead_node){
+		orch_db.replicas_per_node.put(dead_node, 0);
+		RecoverDNMessage recover_dn_message = new RecoverDNMessage(dead_node.address);
+		
+		Set<String> table_names = orch_db.tables_replicas.keySet();
+		Iterator<String> name_itr = table_names.iterator();
+		while(name_itr.hasNext()){
+			String table_name = name_itr.next();
+			NodeInfo[] nodes = orch_db.tables_replicas.get(table_name);
+			for(int i = 0; i < nodes.length; i++){
+				NodeInfo node = nodes[i];
+				if(node == dead_node){
+					NodeInfo new_node = assignNewReplica(table_name, dead_node);
+					recover_dn_message.table_names.add(table_name);
+					recover_dn_message.table_names.add(new_node.address);
+					break;
+				}
+			}
+		}
+		
+		sendRecoverDNMessage(recover_dn_message);
+	}
+	
+	
+	private void sendRecoverDNMessage(RecoverDNMessage recover_dn_message){
+		if(recover_dn_message.table_names.size() == 0 || orch_db.active_pm == null){
+			return;
+		}
+		
+		Socket socket = null;
+		PrintWriter out = null;
+        LogResult result = null;
+        
+        try {   
+        	
+        	//Create socket to the DN
+        	String address =  orch_db.active_pm.address;
+        	String ip = address.split(":")[0];
+        	int port = Integer.parseInt(address.split(":")[1]);
+            socket = new Socket(ip, port);
+            
+            //Init output stream
+            out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
+            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
+            
+            //Send operation type
+            out.print(MessageType.RECOVER_DN_MESSAGE + "\n");
+            out.flush();
+            
+            //Send log message
+            JAXBContext jaxb_context = JAXBContext.newInstance(RecoverDNMessage.class);
+			Marshaller m = jaxb_context.createMarshaller();
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			m.setProperty(Marshaller.JAXB_FRAGMENT,true);
+			m.marshal(recover_dn_message,xsw);
+	        xsw.flush();    // send it now
+
+	        //Close connection
+            xsw.close();
+            out.close();
+            socket.close();
+        } catch (JAXBException e) {
+			logger.error("Error marshling/unmarshling", e);
+		} catch (UnknownHostException e) {
+			logger.error("Error communicating with the remote node", e);
+		} catch (IOException e) {
+			logger.error("Error communicating with the remote node", e);
+		} catch (XMLStreamException e) {
+			logger.error("Error in the XML reader/writer", e);
+		} catch (FactoryConfigurationError e) {
+			logger.error("Error in the XML reader/writer", e);
+		}
+	}
+	
+	private NodeInfo assignNewReplica(String table_name, NodeInfo dead_node){
+		NodeInfo new_node = null;
+		//TODO implement
+		return new_node;
+	}
 	
 	private void electNewPM(){
 		NodeInfo new_active_pm = null;
