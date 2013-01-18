@@ -187,7 +187,7 @@ public class DNMessageHandler implements Runnable {
         	socket2 = new Socket(ip, port);
         	
         	//Init input/output streams
-			XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
+			XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket2.getOutputStream()); 
             out = new PrintWriter(socket2.getOutputStream(), true);
             
             //Sending operation type
@@ -201,9 +201,10 @@ public class DNMessageHandler implements Runnable {
 			m.setProperty(Marshaller.JAXB_FRAGMENT,true);
 			//Sending the result
 			m.marshal( log_message, xsw );
+			xsw.flush();
 			
 			//get response
-			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
+			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket2.getInputStream());
 			logger.info("Waiting for response");
             jaxb_context = JAXBContext.newInstance(LogResult.class);
             result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(xer);	
@@ -213,7 +214,7 @@ public class DNMessageHandler implements Runnable {
 			xer.close();
 			xsw.close();
             out.close();
-            socket.close();
+            socket2.close();
         } catch (JAXBException e) {
 			logger.error("Error marshling/unmarshling", e);
 		} catch (UnknownHostException e) {
