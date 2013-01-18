@@ -200,7 +200,7 @@ public class DNMessageHandler implements Runnable {
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.setProperty(Marshaller.JAXB_FRAGMENT,true);
 			//Sending the result
-			m.marshal( result, xsw );
+			m.marshal( log_message, xsw );
 			
 			//get response
 			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
