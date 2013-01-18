@@ -190,7 +190,7 @@ public class PMMessageHandler implements Runnable {
 			}
 			
 			java.util.Arrays.sort(replicas.addresses);
-			String arr[] = {replicas.addresses[0], replicas.addresses[0]};
+			String arr[] = {replicas.addresses[0], replicas.addresses[1]};
 			//log_message.replicas = replicas.addresses;
 			log_message.replicas = arr;
 			pm_db.replicas.put(msg.table_name, replicas.addresses);
@@ -220,7 +220,7 @@ public class PMMessageHandler implements Runnable {
 	
 	/**
 	 * Send the LogMessage to the given address via TCP connection. Returns the
-	 * result recieved from the remote node. Or an empty result with the error
+	 * result received from the remote node. Or an empty result with the error
 	 * code if an error occurs
 	 */
 	private LogResult sendLogMessage(LogMessage log_message){
@@ -235,9 +235,8 @@ public class PMMessageHandler implements Runnable {
         	int port = Integer.parseInt(log_message.replicas[0].split(":")[1]);
             socket = new Socket(ip, port);
             
-            //Init input/output streams
+            //Init output streams
             out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
-			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
             XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
             
             //Send operation type
@@ -253,6 +252,8 @@ public class PMMessageHandler implements Runnable {
 	        xsw.flush();    // send it now
 
 	        //get response
+	        //Init input stream
+	        XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
             jaxb_context = JAXBContext.newInstance(LogResult.class);
             result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(xer);	
 
