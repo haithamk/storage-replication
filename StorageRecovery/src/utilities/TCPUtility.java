@@ -12,12 +12,12 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TCPFileUtility {
+public class TCPUtility {
 
 	
 	//http://www.dreamincode.net/forums/topic/139154-transfer-a-file-over-tcp/
 	
-	static final Logger logger = LoggerFactory.getLogger(TCPFileUtility.class);
+	static final Logger logger = LoggerFactory.getLogger(TCPUtility.class);
 	
 	
 	/**

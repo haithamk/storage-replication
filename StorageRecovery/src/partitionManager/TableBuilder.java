@@ -18,7 +18,7 @@ import org.w3c.dom.NodeList;
 
 
 import partitionManager.Recovery.TableInfo;
-import utilities.TCPFileUtility;
+import utilities.TCPUtility;
 import utilities.XMLUtility;
 
 public class TableBuilder implements Runnable {
@@ -61,7 +61,7 @@ public class TableBuilder implements Runnable {
             socket.shutdownOutput(); //To send EOF. TODO Do we need this ?
             
             File f = File.createTempFile("REC", "xml");
-            TCPFileUtility.receiveFile(f.getPath(), socket);
+            TCPUtility.receiveFile(f.getPath(), socket);
             out.close();
             in.close();
             socket.close();

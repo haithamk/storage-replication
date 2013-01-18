@@ -1,10 +1,12 @@
 package dataNode;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -18,13 +20,15 @@ import messages.LogResult;
 import messages.LogResult.Status;
 import messages.Message.MessageType;
 
+import org.apache.commons.io.input.CloseShieldInputStream;
+import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import debug.DebugUtility;
 
 import utilities.NoCloseInputStream;
-import utilities.TCPFileUtility;
+import utilities.TCPUtility;
 import utilities.XMLUtility;
 
 public class DNMessageHandler implements Runnable {
@@ -80,7 +84,7 @@ public class DNMessageHandler implements Runnable {
 			logger.info("Handling recover request for table: {} ", table_name); 
 			
 			//Send the given file over the socket
-			TCPFileUtility.sendFile(file_path, socket);
+			TCPUtility.sendFile(file_path, socket);
 			
 			socket.close();
 			logger.info("getTableReplicas result sent successfully");
@@ -164,7 +168,7 @@ public class DNMessageHandler implements Runnable {
 	
 	private LogResult forwardRequest(LogMessage log_message){
 		LogResult result = null;
-		Socket socket = null;
+		Socket socket2 = null;
 		PrintWriter out = null;
         BufferedReader in = null;
 		
@@ -173,21 +177,37 @@ public class DNMessageHandler implements Runnable {
         	String ip = address.split(":")[0];
         	int port = Integer.parseInt(address.split(":")[1]);
         	logger.info("Forwarding request to {}:{}", ip, port);
-            socket = new Socket(ip, port);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        	socket2 = new Socket(ip, port);
+        	socket2.setTcpNoDelay(true);
+            out = new PrintWriter(socket2.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket2.getInputStream()));
+            
+            CloseShieldOutputStream out_2 = new CloseShieldOutputStream(socket2.getOutputStream());
+            CloseShieldInputStream in_2 = new CloseShieldInputStream(socket2.getInputStream());
             
             logger.info("Sending..");
-            out.print(MessageType.LOG_OPERATION + "\n");
+            out_2.write((MessageType.LOG_OPERATION + "\n").getBytes());
             JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			m.marshal( log_message, out );
-			socket.shutdownOutput(); //To send EOF
+			//m.marshal( log_message, out );
+			
+			BufferedOutputStream out2 = new BufferedOutputStream(socket2.getOutputStream());
+			
+			 java.io.StringWriter sw = new StringWriter();
+			 m.marshal(log_message, sw);
+
+			 String str = sw.toString();
+			 out2.write(str.getBytes());
+		//	 out2.write("*".getBytes());
+			 out2.flush();
+		//	out.close();
+			socket2.getOutputStream().flush();
+		///	socket2.shutdownOutput(); //To send EOF
 			
 			logger.info("Waiting for response");
             jaxb_context = JAXBContext.newInstance(LogResult.class);
-            result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(in);	
+            result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(in_2);	
             logger.info("Response received");
             
             out.close();
