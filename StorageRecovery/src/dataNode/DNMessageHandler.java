@@ -114,6 +114,7 @@ public class DNMessageHandler implements Runnable {
 			
 			//Log operation in persistent disk
 			result = logOperation(log_msg);
+			//result = new LogResult();
 			
 			//Creating marshaler
 			jaxb_context = JAXBContext.newInstance(LogResult.class);
@@ -122,6 +123,7 @@ public class DNMessageHandler implements Runnable {
 			m.setProperty(Marshaller.JAXB_FRAGMENT,true);
 			//Sending the result
 			m.marshal( result, xsw );
+			xsw.flush();
 			
 			//Close connection
 			xer.close();
@@ -185,7 +187,6 @@ public class DNMessageHandler implements Runnable {
         	socket2 = new Socket(ip, port);
         	
         	//Init input/output streams
-			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
 			XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
             out = new PrintWriter(socket2.getOutputStream(), true);
             
@@ -202,6 +203,7 @@ public class DNMessageHandler implements Runnable {
 			m.marshal( result, xsw );
 			
 			//get response
+			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
 			logger.info("Waiting for response");
             jaxb_context = JAXBContext.newInstance(LogResult.class);
             result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(xer);	
