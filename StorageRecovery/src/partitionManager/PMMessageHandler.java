@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import utilities.NoCloseInputStream;
 import utilities.NoCloseOutputStream;
+import utilities.TCPUtility;
 
 import messages.ClientOPMsg;
 import messages.DataNodesAddresses;
@@ -37,6 +38,7 @@ import messages.LogResult;
 import messages.LogResult.Status;
 import messages.Message.MessageType;
 import messages.RecoverDNMessage;
+import messages.RecoverPMMessage;
 import messages.RecoverTableMessage;
 
 public class PMMessageHandler implements Runnable {
@@ -77,6 +79,9 @@ public class PMMessageHandler implements Runnable {
 			case RECOVER_DN_MESSAGE:
 				recoverDN();
 				break;
+			case RECOVER:
+				recover();
+				break;
 			default:
 				break;					
 			}
@@ -92,7 +97,33 @@ public class PMMessageHandler implements Runnable {
 		
 	
 	private void recover(){
-		
+		try {
+			//Init input/output streams
+			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
+			
+			//Read log message
+			JAXBContext jaxb_context = JAXBContext.newInstance(RecoverPMMessage.class);
+			RecoverPMMessage recover_msg = (RecoverPMMessage) jaxb_context.createUnmarshaller().unmarshal(xer);
+			
+			
+			Recovery.recover(pm_db, recover_msg);
+			
+        	
+        	PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        	out.println(MessageType.RECOVER);
+            out.println("ACK");
+            out.flush();
+            
+            xer.close();
+            out.close();
+            socket.close();
+		} catch (JAXBException e) {
+			logger.error("Error marshling/unmarshling", e);
+		} catch (IOException e) {
+			logger.error("IO Error", e);
+		} catch (XMLStreamException e) {
+			logger.error("Error in the XML reader/writer", e);
+		}			
 	}
 	
 	

@@ -20,6 +20,7 @@ import javax.xml.stream.XMLStreamWriter;
 import messages.LogMessage;
 import messages.LogResult;
 import messages.RecoverDNMessage;
+import messages.RecoverTableMessage;
 import messages.Message.MessageType;
 import messages.RecoverPMMessage;
 import orchestrator.OrchestratorDB.NodeInfo;
@@ -240,8 +241,55 @@ public class NodesManager extends Thread {
 			recover_pm.replicas.add(replicas);
 		}
 		
-		//TODO send the message to the PM
-		
+		if(recover_pm.table_names.size() > 0){
+			//send the message to the PM
+			sendPMRecoverMessage(recover_pm, new_pm);
+		}
+				
 		orch_db.setActivePM(new_pm);
+	}
+	
+	
+	
+	private void sendPMRecoverMessage(RecoverPMMessage recover_pm, NodeInfo new_pm){
+		Socket socket = null;
+		PrintWriter out = null;
+        try {   
+        	//Create socket to the DN
+        	String ip = new_pm.address.split(":")[0];
+        	int port = Integer.parseInt(new_pm.address.split(":")[1]);
+            socket = new Socket(ip, port);
+            
+            //Init output streams
+            out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
+            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
+            
+            //Send operation type
+            out.println(MessageType.RECOVER);
+            out.flush();
+            
+            //Send RecoverTableMessage message
+            JAXBContext jaxb_context = JAXBContext.newInstance(RecoverPMMessage.class);
+			Marshaller m = jaxb_context.createMarshaller();
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			m.setProperty(Marshaller.JAXB_FRAGMENT,true);
+			m.marshal(recover_pm,xsw);
+	        xsw.flush();    // send it now
+
+            //Close connection
+            xsw.close();
+            out.close();
+            socket.close();
+        } catch (JAXBException e) {
+			logger.error("Error marshling/unmarshling", e);
+		} catch (UnknownHostException e) {
+			logger.error("Error communicating with the remote node", e);
+		} catch (IOException e) {
+			logger.error("Error communicating with the remote node", e);
+		} catch (XMLStreamException e) {
+			logger.error("Error in the XML reader/writer", e);
+		} catch (FactoryConfigurationError e) {
+			logger.error("Error in the XML reader/writer", e);
+		}
 	}
 }
