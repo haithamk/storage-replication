@@ -33,12 +33,20 @@ import utilities.XMLUtility;
 
 public class DNMessageHandler implements Runnable {
 
+	//=========================================================================
+	//================		Members of the class				===============
+	//=========================================================================
+	
 	static final Logger logger = LoggerFactory.getLogger(DNMessageHandler.class);
 	
 	Socket socket;
 	DataNodeDB dn_db;
 	BufferedReader inputReader;
 	
+	
+	//=========================================================================
+	//====================		Public Methods				===================
+	//=========================================================================
 	
 	public DNMessageHandler(Socket socket, DataNodeDB dn_db){
 		logger.debug("New DNMessageHandler created");
@@ -73,6 +81,9 @@ public class DNMessageHandler implements Runnable {
 	}
 	
 	
+	//=========================================================================
+	//================			Auxiliary Methods				===============
+	//=========================================================================
 	
 	private void handleNewTable(){
 		try {

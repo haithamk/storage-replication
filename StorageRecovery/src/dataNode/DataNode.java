@@ -12,12 +12,23 @@ import utilities.HeartbeatSender;
 
 public class DataNode {
 	
+	
+	//=========================================================================
+	//================		Members of the class				===============
+	//=========================================================================
+	
+	
 	private static final Logger logger = LoggerFactory.getLogger(DataNode.class);
 	
 	private HeartbeatSender heartbeat_sender;	//Thread for sending heart beats to the Orchestrator
 	private ServerSocket comm_socket;			//The socket the server listens on to requests
 	private DataNodeDB dn_db;					//The data base for holding informations necessary for DN operating
 	private String node_id;						//The id of the node
+	
+	
+	//=========================================================================
+	//====================		Public Methods				===================
+	//=========================================================================
 	
 	public DataNode(String node_id, String config_file){
 		try {
