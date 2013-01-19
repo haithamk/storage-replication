@@ -37,6 +37,7 @@ import messages.LogResult;
 import messages.LogResult.Status;
 import messages.Message.MessageType;
 import messages.RecoverDNMessage;
+import messages.RecoverTableMessage;
 
 public class PMMessageHandler implements Runnable {
 
@@ -145,7 +146,46 @@ public class PMMessageHandler implements Runnable {
 	}
 	
 	private void sendRecoverMessage(String table_name, String reference_replica, String new_replica){
-		
+		Socket socket = null;
+		PrintWriter out = null;
+        try {   
+        	//Create socket to the DN
+        	String ip = new_replica.split(":")[0];
+        	int port = Integer.parseInt(new_replica.split(":")[1]);
+            socket = new Socket(ip, port);
+            
+            //Init output streams
+            out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
+            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
+            
+            //Send operation type
+            out.println(MessageType.NEW_TABLE);
+            out.flush();
+            
+            //Send RecoverTableMessage message
+            RecoverTableMessage recover_message = new RecoverTableMessage(table_name, reference_replica);
+            JAXBContext jaxb_context = JAXBContext.newInstance(RecoverTableMessage.class);
+			Marshaller m = jaxb_context.createMarshaller();
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			m.setProperty(Marshaller.JAXB_FRAGMENT,true);
+			m.marshal(recover_message,xsw);
+	        xsw.flush();    // send it now
+
+            //Close connection
+            xsw.close();
+            out.close();
+            socket.close();
+        } catch (JAXBException e) {
+			logger.error("Error marshling/unmarshling", e);
+		} catch (UnknownHostException e) {
+			logger.error("Error communicating with the remote node", e);
+		} catch (IOException e) {
+			logger.error("Error communicating with the remote node", e);
+		} catch (XMLStreamException e) {
+			logger.error("Error in the XML reader/writer", e);
+		} catch (FactoryConfigurationError e) {
+			logger.error("Error in the XML reader/writer", e);
+		}
 	}
 	
 	

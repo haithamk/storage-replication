@@ -21,6 +21,7 @@ import messages.LogMessage;
 import messages.LogResult;
 import messages.RecoverDNMessage;
 import messages.Message.MessageType;
+import messages.RecoverPMMessage;
 import orchestrator.OrchestratorDB.NodeInfo;
 import orchestrator.OrchestratorDB.NodeInfo.NodeType;
 
@@ -197,7 +198,6 @@ public class NodesManager extends Thread {
 			orch_db.replicas_per_node.put(new_node, ++min_tables);
 		}
 		
-		
 		return new_node;
 	}
 	
@@ -217,9 +217,31 @@ public class NodesManager extends Thread {
 		if(new_active_pm != null){
 			logger.info("New active Partiton Mananger id: {}", new_active_pm.id);
 			new_pm_needed = false;
+			handleNewPM(new_active_pm);
 		}else{
 			logger.warn("No availbe Partition Managers");
 		}
-		orch_db.setActivePM(new_active_pm);			
+	}
+
+	
+	private void handleNewPM(NodeInfo new_pm){
+		RecoverPMMessage recover_pm = new RecoverPMMessage();
+		
+		Set<String> table_names = orch_db.tables_replicas.keySet();
+		Iterator<String> table_itr = table_names.iterator();
+		while(table_itr.hasNext()){
+			String table_name = table_itr.next();
+			NodeInfo[] nodes = orch_db.tables_replicas.get(table_name);
+			recover_pm.table_names.add(table_name);
+			String[] replicas = new String[nodes.length]; 
+			for(int i = 0; i < nodes.length; i++){
+				replicas[i] = nodes[i].address;
+			}
+			recover_pm.replicas.add(replicas);
+		}
+		
+		//TODO send the message to the PM
+		
+		orch_db.setActivePM(new_pm);
 	}
 }
