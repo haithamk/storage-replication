@@ -15,7 +15,7 @@ public class RecoverDNMessage extends Message {
 	}
 	
 	@XmlElement
-	String dead_node;
+	public String dead_node;
 	
 	@XmlElement
 	public LinkedList<String> table_names;

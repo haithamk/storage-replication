@@ -22,10 +22,12 @@ import messages.LogMessage.OperationType;
 import messages.LogResult;
 import messages.LogResult.Status;
 import messages.Message.MessageType;
+import messages.RecoverTableMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import utilities.NoCloseOutputStream;
 import utilities.TCPUtility;
 import utilities.XMLUtility;
 
@@ -58,11 +60,12 @@ public class DNMessageHandler implements Runnable {
 			case RECOVER:
 				handleRecover();
 				break;
+			case NEW_TABLE:
+				handleNewTable();
+				break;
 			default:
 				break;
 			}
-			
-			
 			
 		} catch (IOException e) {
 			logger.error("IO error occurred while handling message", e);
@@ -70,6 +73,43 @@ public class DNMessageHandler implements Runnable {
 	}
 	
 	
+	
+	private void handleNewTable(){
+		try {
+			
+			//Init input/output streams
+			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
+			
+			//Read log message
+			JAXBContext jaxb_context = JAXBContext.newInstance(RecoverTableMessage.class);
+			RecoverTableMessage recover_msg = (RecoverTableMessage) jaxb_context.createUnmarshaller().unmarshal(xer);
+			
+			String table_name = recover_msg.table_name;
+			String file_path = dn_db.work_dir + table_name + ".xml";
+			String source  = recover_msg.source;
+			logger.info("Handling recover request for table: {} ", table_name); 
+			socket.close();
+			
+			String ip = source.split(":")[0];
+        	int port = Integer.parseInt(source.split(":")[1]);
+        	Socket socket2 = new Socket(ip, port);
+        	
+        	PrintWriter out = new PrintWriter(socket2.getOutputStream(), true);
+        	out.println(MessageType.RECOVER);
+            out.println(table_name);
+            out.flush();
+            
+            TCPUtility.receiveFile(file_path, socket2);
+            out.close();
+            socket.close();
+		} catch (JAXBException e) {
+			logger.error("Error marshling/unmarshling", e);
+		} catch (IOException e) {
+			logger.error("IO Error", e);
+		} catch (XMLStreamException e) {
+			logger.error("Error in the XML reader/writer", e);
+		}			
+	}
 	
 	/**
 	 * Reads the XML file of the requested table and transfers it over socket to

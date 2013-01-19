@@ -36,6 +36,7 @@ import messages.ClientOPResult.ClientOPStatus;
 import messages.LogResult;
 import messages.LogResult.Status;
 import messages.Message.MessageType;
+import messages.RecoverDNMessage;
 
 public class PMMessageHandler implements Runnable {
 
@@ -72,6 +73,9 @@ public class PMMessageHandler implements Runnable {
 			case CLIENT_OPERATION:
 				handleClientOperation();
 				break;
+			case RECOVER_DN_MESSAGE:
+				recoverDN();
+				break;
 			default:
 				break;					
 			}
@@ -87,6 +91,60 @@ public class PMMessageHandler implements Runnable {
 		
 	
 	private void recover(){
+		
+	}
+	
+	
+	private void recoverDN(){
+		try {
+			//Init input/output streams
+			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
+			
+			//Read RecoverDNMessage message
+			JAXBContext jaxb_context = JAXBContext.newInstance(RecoverDNMessage.class);
+			RecoverDNMessage recover_msg = (RecoverDNMessage) jaxb_context.createUnmarshaller().unmarshal(xer);
+			
+			//Close connection
+			xer.close();
+			socket.close();
+			
+			//Recovering the dead data node
+			handleRecoverDN(recover_msg);
+			
+			logger.info("Handling request completed successfully");	
+		} catch (JAXBException e) {
+			logger.error("Error marshling/unmarshling", e);
+		} catch (IOException e) {
+			logger.error("IO Error", e);
+		} catch (XMLStreamException e) {
+			logger.error("Error in the XML reader/writer", e);
+		}			
+	}
+	
+	
+	private void handleRecoverDN(RecoverDNMessage recover_msg){
+		String dead_node = recover_msg.dead_node;
+		for(int i = 0; i < recover_msg.table_names.size(); i++){
+			String table_name = recover_msg.table_names.get(i);
+			String new_node = recover_msg.new_nodes.get(i);
+			
+			String[] replicas = pm_db.replicas.get(table_name);
+			String reference_replica = null;
+			for(int j = 0; j< replicas.length; j++){
+				if(replicas[j].equals(dead_node)){
+					replicas[j] = new_node;
+				}else{
+					reference_replica = replicas[j];
+				}
+			}
+			
+			sendRecoverMessage(table_name, reference_replica, new_node);
+		}
+		
+		
+	}
+	
+	private void sendRecoverMessage(String table_name, String reference_replica, String new_replica){
 		
 	}
 	
@@ -240,7 +298,7 @@ public class PMMessageHandler implements Runnable {
             XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
             
             //Send operation type
-            out.print(MessageType.LOG_OPERATION + "\n");
+            out.println(MessageType.LOG_OPERATION);
             out.flush();
             
             //Send log message

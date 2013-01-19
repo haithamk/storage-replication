@@ -56,8 +56,8 @@ public class TableBuilder implements Runnable {
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            out.print(MessageType.RECOVER + "\n");
-            out.print(table_name);
+            out.println(MessageType.RECOVER);
+            out.println(table_name);
             socket.shutdownOutput(); //To send EOF. TODO Do we need this ?
             
             File f = File.createTempFile("REC", "xml");
