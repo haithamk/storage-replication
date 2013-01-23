@@ -237,7 +237,6 @@ public class DNMessageHandler implements Runnable {
         	socket2 = new Socket(ip, port);
         	
         	//Init input/output streams
-			XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket2.getOutputStream()); 
             out = new PrintWriter(socket2.getOutputStream(), true);
             
             //Sending operation type
@@ -245,6 +244,7 @@ public class DNMessageHandler implements Runnable {
             out.flush();
             
             //Sending log message
+            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket2.getOutputStream()); 
             JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
