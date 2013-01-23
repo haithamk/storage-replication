@@ -165,7 +165,6 @@ public class DNMessageHandler implements Runnable {
 			
 			//Log operation in persistent disk
 			result = logOperation(log_msg);
-			//result = new LogResult();
 			
 			//Creating marshaler
 			jaxb_context = JAXBContext.newInstance(LogResult.class);

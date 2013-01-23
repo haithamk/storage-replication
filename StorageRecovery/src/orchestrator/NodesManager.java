@@ -80,6 +80,7 @@ public class NodesManager extends Thread {
 	
 	
 	private void handleAliveNode(NodeInfo node_info){
+		//TODO implement handleAliveNode 
 	}
 	
 	private void handleDeadNode(NodeInfo dead_node_info){
