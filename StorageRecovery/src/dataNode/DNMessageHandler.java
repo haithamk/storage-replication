@@ -94,15 +94,16 @@ public class DNMessageHandler implements Runnable {
 			//Read log message
 			JAXBContext jaxb_context = JAXBContext.newInstance(RecoverTableMessage.class);
 			RecoverTableMessage recover_msg = (RecoverTableMessage) jaxb_context.createUnmarshaller().unmarshal(xer);
+			socket.close();
 			
 			String table_name = recover_msg.table_name;
 			String file_path = dn_db.work_dir + table_name + ".xml";
-			String source  = recover_msg.source;
+			String reference_table  = recover_msg.reference_table;
 			logger.info("Handling recover request for table: {} ", table_name); 
-			socket.close();
 			
-			String ip = source.split(":")[0];
-        	int port = Integer.parseInt(source.split(":")[1]);
+			
+			String ip = reference_table.split(":")[0];
+        	int port = Integer.parseInt(reference_table.split(":")[1]);
         	Socket socket2 = new Socket(ip, port);
         	
         	PrintWriter out = new PrintWriter(socket2.getOutputStream(), true);
