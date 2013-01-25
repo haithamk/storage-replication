@@ -7,6 +7,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class RecoverTableMessage extends Message {
 
+	public RecoverTableMessage(){}
+	
 	
 	public RecoverTableMessage(String table_name, String source){
 		this.table_name = table_name;

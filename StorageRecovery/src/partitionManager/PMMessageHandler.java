@@ -187,13 +187,13 @@ public class PMMessageHandler implements Runnable {
             
             //Init output streams
             out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
-            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
             
             //Send operation type
             out.println(MessageType.NEW_TABLE);
             out.flush();
             
             //Send RecoverTableMessage message
+            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
             RecoverTableMessage recover_message = new RecoverTableMessage(table_name, reference_replica);
             JAXBContext jaxb_context = JAXBContext.newInstance(RecoverTableMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
