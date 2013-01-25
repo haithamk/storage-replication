@@ -7,6 +7,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import messages.RecoverDNMessage;
+
 
 
 
@@ -26,9 +28,26 @@ public class MarshlingTest {
 		String[] bros = {"Haitham", "Loay", "Waael", "Omar"};
 	}
 	public static void main(String[] args) {
-		testMarshal();
+		//testMarshal();
+		testMarshalList();
 		
-		
+	}
+	
+	public static void testMarshalList(){
+		try{
+			
+			RecoverDNMessage msg = new RecoverDNMessage("111");
+			
+			JAXBContext jaxb_context = JAXBContext.newInstance(RecoverDNMessage.class);
+			Marshaller m = jaxb_context.createMarshaller();
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			
+			m.marshal( msg, System.out);
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	
