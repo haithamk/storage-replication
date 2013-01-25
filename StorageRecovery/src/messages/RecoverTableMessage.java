@@ -12,12 +12,12 @@ public class RecoverTableMessage extends Message {
 	
 	public RecoverTableMessage(String table_name, String source){
 		this.table_name = table_name;
-		this.source = source;
+		this.reference_table = source;
 	}
 	
 	@XmlElement
 	public String table_name;
 	
 	@XmlElement
-	public String source;
+	public String reference_table;
 }
