@@ -95,9 +95,9 @@ public class OrchestratorDB {
 	public OrchestratorDB(String id, String config_file) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
 		logger.info("Initalizing Orchestrator DB");
 		this.id = id;
-		initConfig(config_file);
 		tables_replicas = new Hashtable<String, NodeInfo[]>();
 		replicas_per_node = new Hashtable<OrchestratorDB.NodeInfo, Integer>();
+		initConfig(config_file);
 	}
 	
 	
@@ -152,7 +152,7 @@ public class OrchestratorDB {
 		Set<String> nodes_ids = nodes.keySet();
 		Iterator<String> id_it = nodes_ids.iterator();
 		int num = 0;
-		while(id_it.hasNext() && num < 3){
+		while(id_it.hasNext() && num < 2){
 			String id = id_it.next();
 			NodeInfo node = nodes.get(id);
 			if(node.isAlive() && node.type == NodeType.DataNode){

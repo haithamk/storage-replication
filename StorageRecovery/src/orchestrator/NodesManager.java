@@ -109,8 +109,12 @@ public class NodesManager extends Thread {
 				NodeInfo node = nodes[i];
 				if(node == dead_node){
 					NodeInfo new_node = assignNewReplica(table_name, nodes);
+					if(new_node == null){
+						logger.error("NO enought DNs");
+						System.exit(0);
+					}
 					recover_dn_message.table_names.add(table_name);
-					recover_dn_message.table_names.add(new_node.address);
+					recover_dn_message.new_nodes.add(new_node.address);
 					for(int j = 0; j < nodes.length; j++){
 						if(nodes[j] == dead_node){
 							nodes[j] = new_node;
@@ -175,11 +179,14 @@ public class NodesManager extends Thread {
 	
 	private NodeInfo assignNewReplica(String table_name, NodeInfo[] assigned_nodes){
 		NodeInfo new_node = null;
-		int min_tables = 0;
+		int min_tables = -1;
 		Set<NodeInfo> nodes = orch_db.replicas_per_node.keySet();
 		Iterator<NodeInfo> node_itr = nodes.iterator();
 		while(node_itr.hasNext()){
 			NodeInfo node = node_itr.next();
+			if(!node.isAlive()){
+				continue;
+			}
 			boolean already_assigned = false;
 			for(int i = 0; i < assigned_nodes.length; i++){
 				if(assigned_nodes[i] == node){
@@ -189,7 +196,7 @@ public class NodesManager extends Thread {
 			}
 			
 			int tables_num = orch_db.replicas_per_node.get(node);
-			if(tables_num < min_tables && !already_assigned){
+			if( (min_tables < 0 || tables_num < min_tables) && !already_assigned){
 				new_node = node;
 				min_tables = tables_num;
 			}
