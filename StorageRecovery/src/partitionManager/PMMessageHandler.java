@@ -366,13 +366,13 @@ public class PMMessageHandler implements Runnable {
             
             //Init output streams
             out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
-            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
             
             //Send operation type
             out.println(MessageType.LOG_OPERATION);
             out.flush();
             
             //Send log message
+            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
             JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
