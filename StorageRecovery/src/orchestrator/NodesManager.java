@@ -66,7 +66,7 @@ public class NodesManager extends Thread {
 				}
 			}
 			
-			if(new_pm_needed){
+			if(new_pm_needed || orch_db.active_pm == null){
 				electNewPM();
 			}
 			
@@ -244,7 +244,9 @@ public class NodesManager extends Thread {
 			recover_pm.table_names.add(table_name);
 			String[] replicas = new String[nodes.length]; 
 			for(int i = 0; i < nodes.length; i++){
-				replicas[i] = nodes[i].address;
+				if(nodes[i] != null){
+					replicas[i] = nodes[i].address;
+				}
 			}
 			recover_pm.replicas.add(replicas);
 		}

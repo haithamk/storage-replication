@@ -223,9 +223,9 @@ public class OrchestratorDB {
 			NodeInfo node_info = new NodeInfo(id, NodeType.PartitionManager, ip + ":" + port);
 			nodes.put(id, node_info);
 			
-			if(active_pm == null){
-				active_pm = node_info;
-			}
+//			if(active_pm == null){
+//				active_pm = node_info;
+//			}
 		}
 		
 		NodeList dn_nodes = (NodeList) xpath.compile("//DataNode").evaluate(doc, XPathConstants.NODESET);
