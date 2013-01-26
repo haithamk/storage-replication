@@ -78,7 +78,7 @@ public class Recovery {
 			while(!tables_info.isEmpty()){
 				TableInfo table_info = tables_info.poll();
 				TableBuilder table_builder = new TableBuilder(pm_db, table_info);
-				executers.submit(table_builder);
+				executers.execute(table_builder);
 			}
 			
 			executers.shutdown();
