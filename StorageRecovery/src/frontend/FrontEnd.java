@@ -1,4 +1,4 @@
-package client;
+package frontend;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,13 +31,13 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 
-public class Client {
+public class FrontEnd {
 
 	//=========================================================================
 	//================		Members of the class				===============
 	//=========================================================================
 		
-	static final Logger logger = LoggerFactory.getLogger(Client.class);
+	static final Logger logger = LoggerFactory.getLogger(FrontEnd.class);
 	String orch_ip = null;
 	int orch_port = -1;
 	String pm_ip = null;
@@ -47,7 +47,7 @@ public class Client {
 	//=========================================================================
 	//====================		Public Methods				===================
 	//=========================================================================
-	public Client(String node_id, String config_file){
+	public FrontEnd(String node_id, String config_file){
 		logger.info("Starting Client with parameters node_id= " + node_id + " config_file= " + config_file);
 		try {
 			initConfig(config_file);

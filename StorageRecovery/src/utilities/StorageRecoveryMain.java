@@ -10,8 +10,8 @@ import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import client.Client;
 import dataNode.DataNode;
+import frontend.FrontEnd;
 
 
 public class StorageRecoveryMain {
@@ -40,8 +40,8 @@ public class StorageRecoveryMain {
 		}else if(type.equals("DataNode")){
 			DataNode data_node = new DataNode(node_id, config_file);
 			data_node.run();
-		}else if(type.equals("Client")){
-			Client client = new Client(node_id, config_file);
+		}else if(type.equals("FrontEnd")){
+			FrontEnd client = new FrontEnd(node_id, config_file);
 			client.run();
 		}else{
 			logger.error("Unkown type!");
