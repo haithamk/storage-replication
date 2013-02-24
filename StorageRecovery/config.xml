@@ -41,6 +41,10 @@
 	        <ip>127.0.0.1</ip>
 	        <port>43102</port>
 	    </DataNode>
+	    <DataNode id="103">
+	        <ip>127.0.0.1</ip>
+	        <port>43103</port>
+	    </DataNode>
 	</DataNodes>
 	
 	

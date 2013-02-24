@@ -152,7 +152,7 @@ public class OrchestratorDB {
 		Set<String> nodes_ids = nodes.keySet();
 		Iterator<String> id_it = nodes_ids.iterator();
 		int num = 0;
-		while(id_it.hasNext() && num < 2){
+		while(id_it.hasNext() && num < 3){
 			String id = id_it.next();
 			NodeInfo node = nodes.get(id);
 			if(node.isAlive() && node.type == NodeType.DataNode){
