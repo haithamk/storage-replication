@@ -36,7 +36,7 @@ public class DataNodeDB {
 		
 		File work_file = new File(work_dir);
 		FileUtils.deleteDirectory(work_file);
-		work_file.mkdir();
+		work_file.mkdirs();
 	}
 	
 	private void initConfig(String config_file) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{

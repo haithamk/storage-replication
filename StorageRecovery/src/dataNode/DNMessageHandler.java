@@ -12,10 +12,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import messages.LogMessage;
 import messages.LogMessage.OperationType;
@@ -27,7 +27,6 @@ import messages.RecoverTableMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import utilities.NoCloseOutputStream;
 import utilities.TCPUtility;
 import utilities.XMLUtility;
 
@@ -114,6 +113,7 @@ public class DNMessageHandler implements Runnable {
             TCPUtility.receiveFile(file_path, socket2);
             out.close();
             socket.close();
+            socket2.close();
 		} catch (JAXBException e) {
 			logger.error("Error marshling/unmarshling", e);
 		} catch (IOException e) {
@@ -158,7 +158,6 @@ public class DNMessageHandler implements Runnable {
 			
 			//Init input/output streams
 			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
-			XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
 			
 			//Read log message
 			JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
@@ -173,6 +172,8 @@ public class DNMessageHandler implements Runnable {
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.setProperty(Marshaller.JAXB_FRAGMENT,true);
 			//Sending the result
+
+			XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket.getOutputStream()); 
 			m.marshal( result, xsw );
 			xsw.flush();
 			
@@ -245,14 +246,15 @@ public class DNMessageHandler implements Runnable {
             out.flush();
             
             //Sending log message
-            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket2.getOutputStream()); 
             JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.setProperty(Marshaller.JAXB_FRAGMENT,true);
 			//Sending the result
+			XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket2.getOutputStream()); 
 			m.marshal( log_message, xsw );
 			xsw.flush();
+			out.flush();
 			
 			//get response
 			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket2.getInputStream());

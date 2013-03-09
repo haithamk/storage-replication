@@ -16,10 +16,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -193,7 +193,7 @@ public class PMMessageHandler implements Runnable {
             out.flush();
             
             //Send RecoverTableMessage message
-            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
+            XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket.getOutputStream()); 
             RecoverTableMessage recover_message = new RecoverTableMessage(table_name, reference_replica);
             JAXBContext jaxb_context = JAXBContext.newInstance(RecoverTableMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
@@ -204,7 +204,7 @@ public class PMMessageHandler implements Runnable {
 
             //Close connection
             xsw.close();
-            out.close();
+           // out.close();
             socket.close();
         } catch (JAXBException e) {
 			logger.error("Error marshling/unmarshling", e);
@@ -372,7 +372,7 @@ public class PMMessageHandler implements Runnable {
             out.flush();
             
             //Send log message
-            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
+            XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket.getOutputStream()); 
             JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);

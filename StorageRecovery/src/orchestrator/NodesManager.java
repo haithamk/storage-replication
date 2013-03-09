@@ -12,10 +12,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import messages.LogMessage;
 import messages.LogResult;
@@ -146,7 +146,7 @@ public class NodesManager extends Thread {
             
             //Init output stream
             out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
-            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
+            XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket.getOutputStream()); 
             
             //Send operation type
             out.print(MessageType.RECOVER_DN_MESSAGE + "\n");
@@ -272,7 +272,7 @@ public class NodesManager extends Thread {
             
             //Init output streams
             out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
-            XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(socket.getOutputStream()); 
+            XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket.getOutputStream()); 
             
             //Send operation type
             out.println(MessageType.RECOVER);
