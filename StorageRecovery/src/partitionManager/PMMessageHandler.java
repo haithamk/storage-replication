@@ -1,11 +1,16 @@
 package partitionManager;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Collections;
@@ -366,32 +371,60 @@ public class PMMessageHandler implements Runnable {
         	int port = Integer.parseInt(log_message.replicas[0].split(":")[1]);
             socket = new Socket(ip, port);
             
+            System.out.println("1");
             //Init output streams
             out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
-            
+            System.out.println("2");
             //Send operation type
             out.println(MessageType.LOG_OPERATION);
             out.flush();
+            //out.close();
+            System.out.println("3");
             
             //Send log message
-            XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket.getOutputStream()); 
+            System.out.println("4");
+          //  XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket.getOutputStream()); 
             JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			m.setProperty(Marshaller.JAXB_FRAGMENT,true);
-			m.marshal(log_message,xsw);
-	        xsw.flush();    // send it now
+			//m.setProperty(Marshaller.JAXB_FRAGMENT,true);
+			
+			StringWriter str_writer = new StringWriter();
+			m.marshal(log_message,str_writer);
+			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+			oos.writeObject(str_writer.toString());
+			oos.flush();
+			
+			
+			//m.marshal(log_message,out);
+			out.flush();
+			System.out.println("5");
+	      //  xsw.flush();    // send it now
+	        socket.getOutputStream().flush();
+          //  xsw.close();
+            System.out.println("6");
 
-	        //get response
-	        //Init input stream
-	        XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
-            jaxb_context = JAXBContext.newInstance(LogResult.class);
-            result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(xer);	
-
+//	        //get response
+//	        //Init input stream
+//            XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
+//            System.out.println("7");
+//            jaxb_context = JAXBContext.newInstance(LogResult.class);
+//            result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(xer);	
+//            System.out.println("8");
+            
+            
+            ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+            logger.info("Waiting for response");
+		    String str = (String) ois.readObject();
+		    StringReader reader = new StringReader(str);
+		    jaxb_context = JAXBContext.newInstance(LogResult.class);
+		    result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(reader);	
+            logger.info("Response received");
+            
             //Close connection
-            xsw.close();
-            xer.close();
+//            xer.close();
             out.close();
+            oos.close();
             socket.close();
         } catch (JAXBException e) {
 			logger.error("Error marshling/unmarshling", e);
@@ -399,10 +432,13 @@ public class PMMessageHandler implements Runnable {
 			logger.error("Error communicating with the remote node", e);
 		} catch (IOException e) {
 			logger.error("Error communicating with the remote node", e);
-		} catch (XMLStreamException e) {
+		} /*catch (XMLStreamException e) {
 			logger.error("Error in the XML reader/writer", e);
-		} catch (FactoryConfigurationError e) {
+		}*/ catch (FactoryConfigurationError e) {
 			logger.error("Error in the XML reader/writer", e);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		return result;
