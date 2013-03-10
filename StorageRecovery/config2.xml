@@ -6,7 +6,7 @@
 	
 	<Orchestrators>
 		<Orchestrator id="0">
-			<ip>127.0.0.1</ip>			
+			<ip>132.68.60.158</ip>			
 			<port>43000</port>
 			<nodes-refresh-rate>1000</nodes-refresh-rate>
 		</Orchestrator>
@@ -14,12 +14,12 @@
 	
 	<PartitionManagers>
 		<PartitionManager id = "10">
-			<ip>127.0.0.1</ip>
+			<ip>132.68.60.158</ip>
 			<port>43010</port>
 		</PartitionManager>
 		
 		<PartitionManager id = "11">
-			<ip>127.0.0.1</ip>
+			<ip>132.68.60.158</ip>
 			<port>43011</port>
 		</PartitionManager>
 		
@@ -31,19 +31,19 @@
 	       /home/shaithm/Test/DN/
 	    </WorkDir>
 	    <DataNode id="100">
-	        <ip>127.0.0.1</ip>
+	        <ip>132.68.60.158</ip>
 	        <port>43100</port>
 	    </DataNode>
 	     <DataNode id="101">
-	        <ip>127.0.0.1</ip>
+	        <ip>132.68.60.158</ip>
 	        <port>43101</port>
 	    </DataNode>
 	     <DataNode id="102">
-	        <ip>127.0.0.1</ip>
+	        <ip>132.68.60.122</ip>
 	        <port>43102</port>
 	    </DataNode>
 	    <DataNode id="103">
-	        <ip>127.0.0.1</ip>
+	        <ip>132.68.60.122</ip>
 	        <port>43103</port>
 	    </DataNode>
 	</DataNodes>

@@ -169,7 +169,11 @@ public class DNMessageHandler implements Runnable {
 //			XMLEventReader xer = input_factory.createXMLEventReader(new BufferedReader(new InputStreamReader(input_stream)));
 			
 			System.out.println("1");
-			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+			InputStream inputStream = socket.getInputStream();
+			System.out.println("1.1");
+			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+			System.out.println("1.2");
+			ObjectInputStream ois = new ObjectInputStream(bufferedInputStream);
 			System.out.println("2");
 		    String str = (String) ois.readObject();
 		    System.out.println("3");
