@@ -91,6 +91,13 @@ public class FrontEnd extends Component{
 		//Loading Orchestrator port
 		String dummy_str = xpath.compile("//Orchestrator/port").evaluate(doc);
 		orch_port = Integer.parseInt(dummy_str);
+		
+		//Loading HTTP Port
+		dummy_str = xpath.compile("//FrontEnd/port").evaluate(doc);
+		http_port = Integer.parseInt(dummy_str);
+		//Loading isServer
+		dummy_str = xpath.compile("//FrontEnd/isServer").evaluate(doc);
+		isServer = Boolean.parseBoolean(dummy_str);
 		logger.info("orch_ip = " + orch_ip + " orch_port = " + orch_port);
 	}
 	
@@ -116,28 +123,28 @@ public class FrontEnd extends Component{
 	
 	
 	private String executeCommandFromRequest(String str){
-		String result = null;
+		String result = "ERROR";
 		String[] cmds = str.split("/");
 		
 		try{
-			if(cmds[0].toUpperCase().equals("GETPM")){
+			if(cmds[1].toUpperCase().equals("GETPM")){
 				// /GetPM
 				result = getPM();
-			}else if(cmds[0].toUpperCase().equals("CREATE")){
+			}else if(cmds[1].toUpperCase().equals("CREATE")){
 				// /Create/Table/<table-name>
 				result = createTable(cmds[2]);
-			}else if(cmds[0].toUpperCase().equals("DELETE") && cmds[1].toUpperCase().equals("TABLE")){
+			}else if(cmds[1].toUpperCase().equals("DELETE") && cmds[2].toUpperCase().equals("TABLE")){
 				// /Delete/Table/<table-name>
-				result = dropTable(cmds[2]);
-			}else if(cmds[0].toUpperCase().equals("PUT")){
+				result = dropTable(cmds[3]);
+			}else if(cmds[1].toUpperCase().equals("PUT")){
 				// /Put/<table-name>/<key>/<value>
-				result = store(cmds[1], cmds[2], cmds[3]);
-			}else if(cmds[0].toUpperCase().equals("READ")){
+				result = store(cmds[2], cmds[3], cmds[4]);
+			}else if(cmds[1].toUpperCase().equals("READ")){
 				// /Read/<table-name>/<key>
-				result = read(cmds[1], cmds[2]);
-			}else if(cmds[0].toUpperCase().equals("DELETE") && cmds[1].toUpperCase().equals("TABLE")){
+				result = read(cmds[2], cmds[2]);
+			}else if(cmds[1].toUpperCase().equals("DELETE") && cmds[2].toUpperCase().equals("TABLE")){
 				// /Delete/Value/<tbale-name>/<key>
-				result = delete(cmds[2], cmds[3]);
+				result = delete(cmds[3], cmds[4]);
 			}
 		}catch(Exception e){
 			e.printStackTrace();

@@ -12,6 +12,13 @@
 		</Orchestrator>
 	</Orchestrators>
 	
+	<FrontEnds>
+		<FrontEnd id="0">
+			<port>8182</port>
+			<isServer>true</isServer>
+		</FrontEnd>
+	</FrontEnds>
+	
 	<PartitionManagers>
 		<PartitionManager id = "10">
 			<ip>127.0.0.1</ip>
