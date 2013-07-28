@@ -48,7 +48,13 @@ public class PartitionManagerDB {
 		replicas = new Hashtable<String, String[]>();
 	}
 	
-	
+	/**
+	 * Resets the DB
+	 */
+	public void reset(){
+		tables.clear();
+		replicas.clear();
+	}
 	
 	/**
 	 * Create a new empty table with the given name. If another table with the

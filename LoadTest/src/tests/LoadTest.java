@@ -80,6 +80,9 @@ public class LoadTest {
 				reset(data_nodes_num);
 				double result = runTest(clients_num);
 				results.add(String.format("%d:%d:%f", data_nodes_num, clients_num, result));
+				Thread.sleep(5000);
+				reset(data_nodes_num);
+				Thread.sleep(5000);
 			}
 		}
 		

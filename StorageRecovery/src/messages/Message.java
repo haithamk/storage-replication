@@ -14,7 +14,8 @@ public abstract class Message {
 		LOG_OPERATION,
 		RECOVER,
 		RECOVER_DN_MESSAGE,
-		NEW_TABLE
+		NEW_TABLE,
+		RESET
 	};
 	
 	

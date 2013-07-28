@@ -2,6 +2,7 @@ package dataNode;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,6 +33,7 @@ import messages.LogResult.Status;
 import messages.Message.MessageType;
 import messages.RecoverTableMessage;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +72,9 @@ public class DNMessageHandler implements Runnable {
 			MessageType type = MessageType.valueOf(inputReader.readLine());
 			logger.info("Handling message of type: {}", type.toString());
 			switch (type) {
+			case RESET:
+				reset();
+				break;
 			case LOG_OPERATION: 
 				handleLogOperation();
 				break;
@@ -92,6 +97,12 @@ public class DNMessageHandler implements Runnable {
 	//=========================================================================
 	//================			Auxiliary Methods				===============
 	//=========================================================================
+	
+	private void reset() throws IOException{
+		File work_file = new File(dn_db.work_dir);
+		FileUtils.deleteDirectory(work_file);
+		work_file.mkdirs();
+	}
 	
 	private void handleNewTable(){
 		try {

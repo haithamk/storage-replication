@@ -80,6 +80,9 @@ public class PMMessageHandler implements Runnable {
 			logger.info("Handling message of type: {}", type);
 			
 			switch(type){
+			case RESET:
+				reset();
+				break;
 			case CLIENT_OPERATION:
 				handleClientOperation();
 				break;
@@ -102,6 +105,9 @@ public class PMMessageHandler implements Runnable {
 	//================			Auxiliary Methods				===============
 	//=========================================================================
 		
+	private void reset(){
+		pm_db.reset();
+	}
 	
 	private void recover(){
 		try {
