@@ -1,0 +1,24 @@
+<config>
+	<min_clients>
+		1
+	</min_clients>
+	<max_clients>
+		8
+	</max_clients>
+	
+	<min_data_nodes>
+		3
+	</min_data_nodes>
+	<max_data_nodes>
+		5
+	</max_data_nodes>
+	
+	<requests_number>
+		40000
+	</requests_number>
+	
+	<tables_number>
+		40
+	</tables_number>
+	
+</config>
