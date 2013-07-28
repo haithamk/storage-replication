@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Collection;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
+import orchestrator.OrchestratorDB.NodeInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,8 @@ public class OrchMessageHandler implements Runnable {
 			logger.info("Handling message of type: {}", type);
 			
 			switch(type){
+			case RESET:
+				handleReset();
 			case GET_PM_ADDRESS:
 				handleGetPMAddress();
 				break;
@@ -63,6 +68,18 @@ public class OrchMessageHandler implements Runnable {
 	}
 	
 	
+	public void handleReset(){
+		Collection<NodeInfo> nodes = orch_db.nodes.values();
+		for(NodeInfo node: nodes){
+			sendResetToNode(node);
+		}
+		orch_db.reset();
+		
+	}
+	
+	private void sendResetToNode(NodeInfo node){
+		//TODO
+	}
 	
 	public void getTableReplicas(){
 		try{

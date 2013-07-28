@@ -100,6 +100,10 @@ public class OrchestratorDB {
 		initConfig(config_file);
 	}
 	
+	public void reset(){
+		tables_replicas = new Hashtable<String, NodeInfo[]>();
+		replicas_per_node = new Hashtable<OrchestratorDB.NodeInfo, Integer>();
+	}
 	
 	/**
 	 * Atomically return the active PM address
