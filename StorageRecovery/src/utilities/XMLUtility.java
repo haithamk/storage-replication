@@ -19,9 +19,21 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+//OP: we are cool
+/**
+ * Useful XML methods
+ */
 public class XMLUtility {
 
+	//=========================================================================
+	//================		Members of the class				===============
+	//=========================================================================
+	
 	static final Logger logger = LoggerFactory.getLogger(XMLUtility.class);
+	
+	//=========================================================================
+	//====================		Public Methods				===================
+	//=========================================================================
 	
 	public static void createFile(String file_path){
 		 
@@ -41,8 +53,6 @@ public class XMLUtility {
 		}
          
 	}
-	
-	
 	
 	public static void deleteFile(String file_path){
 		File f = new File(file_path);
@@ -79,6 +89,9 @@ public class XMLUtility {
 		return null;
 	}
 	
+	//=========================================================================
+	//====================		Private  Methods			===================
+	//=========================================================================
 	
 	private static void addEntry(String file_path, String operation, String key, String value){
 		
@@ -100,8 +113,6 @@ public class XMLUtility {
 		saveFile(file_path, doc);
 		
 	}
-	
-	
 	
 	private static void saveFile(String file_path, Document doc){
 		try {

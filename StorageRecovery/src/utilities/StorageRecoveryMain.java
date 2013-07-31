@@ -13,13 +13,9 @@ import org.slf4j.Logger;
 import dataNode.DataNode;
 import frontend.FrontEnd;
 
-
+//OP: Good
 public class StorageRecoveryMain {
 
-	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {	
 		String type = args[0];
 		String node_id = args[1];
@@ -29,7 +25,6 @@ public class StorageRecoveryMain {
 		final Logger logger = LoggerFactory.getLogger(StorageRecoveryMain.class);
 			
 		logger.info("New node initiated with parameters: Type: " + type + " ID: " + node_id + " Config: " + config_file);
-		
 		
 		if(type.equals("Orchestrator")){
 			Orchestrator orch = new Orchestrator(node_id, config_file);

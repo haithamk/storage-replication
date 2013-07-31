@@ -14,12 +14,20 @@ import utilities.HeartbeatSender;
 
 public class PartitionManager {
 	
+	//=========================================================================
+	//================		Members of the class				===============
+	//=========================================================================
+	
 	static final Logger logger = LoggerFactory.getLogger(PartitionManager.class);
 	PartitionManagerDB pm_db;
 	private ExecutorService pool;
 	private ServerSocket commSocket;
 	private HeartbeatSender heartbeat_sender;
 	
+	
+	//=========================================================================
+	//====================		Public Methods				===================
+	//=========================================================================
 	
 	public PartitionManager(String node_id, String config_file){
 		try{

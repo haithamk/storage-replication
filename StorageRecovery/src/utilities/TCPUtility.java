@@ -12,13 +12,24 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//OP: we are cool
+/**
+ * Useful TCP methods.
+ * 	http://www.dreamincode.net/forums/topic/139154-transfer-a-file-over-tcp/
+ */
 public class TCPUtility {
 
-	
-	//http://www.dreamincode.net/forums/topic/139154-transfer-a-file-over-tcp/
-	
+
+	//=========================================================================
+	//================		Members of the class				===============
+	//=========================================================================
+		
 	static final Logger logger = LoggerFactory.getLogger(TCPUtility.class);
 	
+	
+	//=========================================================================
+	//====================		Public Methods				===================
+	//=========================================================================
 	
 	/**
 	 * Receives a path to a file and a socket connection. Reads the file contents
@@ -74,6 +85,10 @@ public class TCPUtility {
 		
 		return result;
 	}
+
+	//=========================================================================
+	//====================		Private  Methods			===================
+	//=========================================================================
 	
 	/**
 	 * Reads the file contents from disk and returns them as a string
@@ -89,6 +104,7 @@ public class TCPUtility {
 	        stringBuilder.append( line );
 	        stringBuilder.append( ls );
 	    }
+	    reader.close();
 
 	    return stringBuilder.toString();
 	}

@@ -10,14 +10,21 @@ import java.net.UnknownHostException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//OP: GOOD
 public class HeartbeatSender extends Thread {
 
+	//=========================================================================
+	//================		Members of the class				===============
+	//=========================================================================
 	static final Logger logger = LoggerFactory.getLogger(HeartbeatSender.class);
 	
 	int rate;
 	DatagramPacket packet;
 	DatagramSocket client_socket;
-	
+
+	//=========================================================================
+	//====================		Public Methods				===================
+	//=========================================================================
 	
 	public HeartbeatSender(String id, int rate, String dest_ip, int dest_port){
 		try{
@@ -36,7 +43,7 @@ public class HeartbeatSender extends Thread {
 		
 	}
 	
-	
+
 	@Override
 	public void run(){
 		
