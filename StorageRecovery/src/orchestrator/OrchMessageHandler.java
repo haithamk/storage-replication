@@ -95,7 +95,7 @@ public class OrchMessageHandler implements Runnable {
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			
-			OutputStream out = socket.getOutputStream();
+			OutputStream out = new ObjectOutputStream(socket.getOutputStream());
 			m.marshal( addresses, out );
 			out.flush();
 			out.close();

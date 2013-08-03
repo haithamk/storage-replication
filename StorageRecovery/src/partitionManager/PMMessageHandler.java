@@ -58,6 +58,7 @@ public class PMMessageHandler implements Runnable {
 	static final Logger logger = LoggerFactory.getLogger(PMMessageHandler.class);
 	Socket socket;
 	PartitionManagerDB pm_db;
+	ObjectInputStream in;
 	
 	
 	
@@ -74,9 +75,9 @@ public class PMMessageHandler implements Runnable {
 	public void run() {
 		try {
 			
-			DataInputStream inputReader = new DataInputStream(new ObjectInputStream(socket.getInputStream()));
+			in = new ObjectInputStream(socket.getInputStream());
 			@SuppressWarnings("deprecation")
-			MessageType type = MessageType.valueOf(inputReader.readLine());
+			MessageType type = MessageType.valueOf(in.readLine());
 			logger.info("Handling message of type: {}", type);
 			
 			switch(type){
@@ -239,7 +240,7 @@ public class PMMessageHandler implements Runnable {
 	 */
 	private void handleClientOperation(){
 		try{
-			NoCloseInputStream in = new NoCloseInputStream(new ObjectInputStream(socket.getInputStream()));
+		//	NoCloseInputStream in = new NoCloseInputStream(new ObjectInputStream(socket.getInputStream()));
 			JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
 			ClientOPMsg msg = (ClientOPMsg) jaxb_context.createUnmarshaller().unmarshal(in);			
 			logger.debug("Message headers:\n{}\nMessage content:\n{}", msg.getHeaders(), msg.toString());
@@ -389,7 +390,6 @@ public class PMMessageHandler implements Runnable {
             
             //Send log message
             System.out.println("4");
-          //  XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket.getOutputStream()); 
             JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -469,21 +469,20 @@ public class PMMessageHandler implements Runnable {
 	private DataNodesAddresses assignReplicas(String table_name){
 		Socket socket = null;
 		PrintWriter out = null;
-        BufferedReader in = null;
+		InputStreamReader local_in = null;
         DataNodesAddresses result = null;
  
         try {    
             socket = new Socket(pm_db.orch_ip, pm_db.orch_port);
             out = new PrintWriter(new ObjectOutputStream(socket.getOutputStream()), true);
-            in = new BufferedReader(new InputStreamReader(new ObjectInputStream(socket.getInputStream())));
 
             //Sending request
             out.println(MessageType.GET_TABLE_REPLICAS);
             out.println(table_name);
             
-            
+            local_in = new InputStreamReader(new ObjectInputStream(socket.getInputStream()));
             JAXBContext jaxb_context = JAXBContext.newInstance(DataNodesAddresses.class);
-            result = (DataNodesAddresses) jaxb_context.createUnmarshaller().unmarshal(in);	
+            result = (DataNodesAddresses) jaxb_context.createUnmarshaller().unmarshal(local_in);	
 
             out.close();
             in.close();

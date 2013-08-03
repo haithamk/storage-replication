@@ -375,21 +375,27 @@ public class FrontEnd extends Component{
 		private ClientOPResult executeOperationAux(ClientOPMsg msg) throws UnknownHostException, IOException{
 			Socket socket = null;
 			PrintWriter out = null;
-			InputStreamReader in = null;
+			ObjectInputStream in = null;
 	        ClientOPResult result = null;
 	 
 	        try {    
 	            socket = new Socket(pm_ip, pm_port);
+	            System.out.println("Creating output stream");
 	            out = new PrintWriter(new ObjectOutputStream(socket.getOutputStream()), true);
-	            in = new InputStreamReader(new ObjectInputStream(socket.getInputStream()));
-	            
-	            out.print("CLIENT_OPERATION\n");
+	            System.out.println("Writing CLIENT_OPERATION output stream");	            
+	            out.println("CLIENT_OPERATION");
 	            JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
 				Marshaller m = jaxb_context.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+				System.out.println("Writing Marshaled message output stream");
 				m.marshal( msg, out );
-				socket.shutdownOutput(); //To send EOF
+				System.out.println("message written");
+				out.flush();
+				out.close();
+				System.out.println("Message flushed");
+				//socket.shutdownOutput(); //To send EOF
 				
+				in = new ObjectInputStream(socket.getInputStream());
 	            jaxb_context = JAXBContext.newInstance(ClientOPResult.class);
 	            result = (ClientOPResult) jaxb_context.createUnmarshaller().unmarshal(in);	
 
