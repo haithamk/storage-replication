@@ -68,8 +68,11 @@ public class DNMessageHandler implements Runnable {
 	@Override
 	public void run() {
 		try{
-			inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			MessageType type = MessageType.valueOf(inputReader.readLine());
+			ObjectInputStream obj_reader = new ObjectInputStream(socket.getInputStream());
+			//inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			
+			MessageType type = MessageType.valueOf(obj_reader.readLine());
+			//MessageType type = MessageType.valueOf(inputReader.readLine());
 			logger.info("Handling message of type: {}", type.toString());
 			switch (type) {
 			case RESET:
@@ -185,6 +188,7 @@ public class DNMessageHandler implements Runnable {
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
 			System.out.println("1.2");
 			ObjectInputStream ois = new ObjectInputStream(bufferedInputStream);
+			//ObjectInputStream ois = new ObjectInputStream(inputReader);
 			System.out.println("2");
 		    String str = (String) ois.readObject();
 		    System.out.println("3");
@@ -282,7 +286,7 @@ public class DNMessageHandler implements Runnable {
         	socket2 = new Socket(ip, port);
         	
         	//Init input/output streams
-            out = new PrintWriter(new NoCloseOutputStream(socket2.getOutputStream()), true);
+            out = new PrintWriter(new NoCloseOutputStream(new ObjectOutputStream(socket2.getOutputStream())), true);
             
             //Sending operation type
             out.println(MessageType.LOG_OPERATION);

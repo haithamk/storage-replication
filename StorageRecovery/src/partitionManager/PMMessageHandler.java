@@ -379,7 +379,7 @@ public class PMMessageHandler implements Runnable {
             
             System.out.println("1");
             //Init output streams
-            out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
+            out = new PrintWriter(new NoCloseOutputStream(new ObjectOutputStream(socket.getOutputStream())), true);
             System.out.println("2");
             //Send operation type
             out.println(MessageType.LOG_OPERATION);

@@ -15,7 +15,7 @@
 	<FrontEnds>
 		<FrontEnd id="0">
 			<port>8182</port>
-			<isServer>true</isServer>
+			<isServer>false</isServer>
 		</FrontEnd>
 	</FrontEnds>
 	
@@ -34,8 +34,8 @@
 	
 	<DataNodes>
 	    <WorkDir>
-	       <!-- F:/Test/DN/ -->
-	       /home/shaithm/Test/DN/
+	       C:/Haitham/DNs/
+	       <!-- /home/shaithm/Test/DN/ -->
 	    </WorkDir>
 	    <DataNode id="100">
 	        <ip>127.0.0.1</ip>
