@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -230,17 +232,20 @@ public class FrontEnd extends Component{
 	 	private String getPM(){
 			Socket socket = null;
 	        PrintWriter out = null;
-	        BufferedReader in = null;
+	        ObjectInputStream in = null;
 	 
 	        try {
+	        	System.out.println("creating socket");
 	            socket = new Socket(orch_ip, orch_port);
-	            out = new PrintWriter(socket.getOutputStream(), true);
-	            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-	            //out.print(Message.MessageType.GET_PM_ADDRESS);
-	            out.print("GET_PM_ADDRESS" + System.getProperty("line.separator"));
+	            out = new PrintWriter(new ObjectOutputStream(socket.getOutputStream()), true);            
+	            System.out.println("GET_PM_ADDRESS");
+	            out.println("GET_PM_ADDRESS");
 	            out.flush();
+	            System.out.println("Done");
+	            
 	            
 	            //DebugUtility.printSocket(socket);
+	            in = new ObjectInputStream(socket.getInputStream());
 	            JAXBContext jaxb_context = JAXBContext.newInstance(PMAddressMsg.class);
 	            PMAddressMsg msg = (PMAddressMsg) jaxb_context.createUnmarshaller().unmarshal(in);	
 	            logger.info("Active PM Address: " + msg.msg_content);
@@ -370,13 +375,13 @@ public class FrontEnd extends Component{
 		private ClientOPResult executeOperationAux(ClientOPMsg msg) throws UnknownHostException, IOException{
 			Socket socket = null;
 			PrintWriter out = null;
-	        BufferedReader in = null;
+			InputStreamReader in = null;
 	        ClientOPResult result = null;
 	 
 	        try {    
 	            socket = new Socket(pm_ip, pm_port);
-	            out = new PrintWriter(socket.getOutputStream(), true);
-	            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+	            out = new PrintWriter(new ObjectOutputStream(socket.getOutputStream()), true);
+	            in = new InputStreamReader(new ObjectInputStream(socket.getInputStream()));
 	            
 	            out.print("CLIENT_OPERATION\n");
 	            JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);

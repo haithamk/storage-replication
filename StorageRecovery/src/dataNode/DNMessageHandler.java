@@ -68,12 +68,10 @@ public class DNMessageHandler implements Runnable {
 	@Override
 	public void run() {
 		try{
-			ObjectInputStream obj_reader = new ObjectInputStream(socket.getInputStream());
-			//inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
+			ObjectInputStream obj_reader = new ObjectInputStream(socket.getInputStream());			
 			MessageType type = MessageType.valueOf(obj_reader.readLine());
-			//MessageType type = MessageType.valueOf(inputReader.readLine());
 			logger.info("Handling message of type: {}", type.toString());
+			
 			switch (type) {
 			case RESET:
 				reset();
@@ -128,7 +126,7 @@ public class DNMessageHandler implements Runnable {
         	int port = Integer.parseInt(reference_table.split(":")[1]);
         	Socket socket2 = new Socket(ip, port);
         	
-        	PrintWriter out = new PrintWriter(socket2.getOutputStream(), true);
+        	PrintWriter out = new PrintWriter(new ObjectOutputStream(socket2.getOutputStream()), true);
         	out.println(MessageType.RECOVER);
             out.println(table_name);
             out.flush();
@@ -184,11 +182,7 @@ public class DNMessageHandler implements Runnable {
 			
 			System.out.println("1");
 			InputStream inputStream = socket.getInputStream();
-			System.out.println("1.1");
-			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-			System.out.println("1.2");
-			ObjectInputStream ois = new ObjectInputStream(bufferedInputStream);
-			//ObjectInputStream ois = new ObjectInputStream(inputReader);
+			ObjectInputStream ois = new ObjectInputStream(inputStream);
 			System.out.println("2");
 		    String str = (String) ois.readObject();
 		    System.out.println("3");
@@ -208,12 +202,7 @@ public class DNMessageHandler implements Runnable {
 			jaxb_context = JAXBContext.newInstance(LogResult.class);
 			Marshaller m = jaxb_context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			//m.setProperty(Marshaller.JAXB_FRAGMENT,true);
 			//Sending the result
-
-//			XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket.getOutputStream()); 
-//			m.marshal( result, xsw );
-//			xsw.flush();
 			
 			StringWriter str_writer = new StringWriter();
 			m.marshal(result,str_writer);
@@ -222,8 +211,6 @@ public class DNMessageHandler implements Runnable {
 			oos.close();
 			
 			//Close connection
-//			xer.close();
-//			xsw.close();
 			socket.close();
 			logger.info("Handling request completed successfully");	
 		} catch (JAXBException e) {
@@ -291,7 +278,6 @@ public class DNMessageHandler implements Runnable {
             //Sending operation type
             out.println(MessageType.LOG_OPERATION);
             out.flush();
-           // out.close();
             
             //Sending log message
             JAXBContext jaxb_context = JAXBContext.newInstance(LogMessage.class);
@@ -299,29 +285,13 @@ public class DNMessageHandler implements Runnable {
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.setProperty(Marshaller.JAXB_FRAGMENT,true);
 			//Sending the result
-			//XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket2.getOutputStream()); 
-			//m.marshal( log_message, out );
 			
 			StringWriter str_writer = new StringWriter();
 			m.marshal(log_message,str_writer);
 			ObjectOutputStream oos = new ObjectOutputStream(socket2.getOutputStream());
 			oos.writeObject(str_writer.toString());
-			oos.flush();
-			socket2.getOutputStream().flush();
-			
-			out.flush();
-			//xsw.flush();
-			//socket2.getOutputStream().flush();
-			//xsw.close();
-			
+			oos.flush();			
 			logger.info("Sent");
-			
-			//get response
-//			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket2.getInputStream());
-//			logger.info("Waiting for response");
-//            jaxb_context = JAXBContext.newInstance(LogResult.class);
-//            result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(xer);	
-//            logger.info("Response received");
             
             ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(socket2.getInputStream()));
             logger.info("Waiting for response");
@@ -331,8 +301,6 @@ public class DNMessageHandler implements Runnable {
 		    result = (LogResult) jaxb_context.createUnmarshaller().unmarshal(reader);	
             logger.info("Response received");
             
-            //Close connection
-//			xer.close();
             out.close();
             oos.close();
             socket2.close();
@@ -342,12 +310,9 @@ public class DNMessageHandler implements Runnable {
 			logger.error("Error communicating with the remote node", e);
 		} catch (IOException e) {
 			logger.error("Error communicating with the remote node", e);
-		} /*catch (XMLStreamException e) {
-			logger.error("Error in the XML reader/writer", e);
-		}*/ catch (FactoryConfigurationError e) {
+		} catch (FactoryConfigurationError e) {
 			logger.error("Error in the XML reader/writer", e);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

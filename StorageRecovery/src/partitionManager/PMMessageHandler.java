@@ -74,7 +74,7 @@ public class PMMessageHandler implements Runnable {
 	public void run() {
 		try {
 			
-			DataInputStream inputReader = new DataInputStream(socket.getInputStream());
+			DataInputStream inputReader = new DataInputStream(new ObjectInputStream(socket.getInputStream()));
 			@SuppressWarnings("deprecation")
 			MessageType type = MessageType.valueOf(inputReader.readLine());
 			logger.info("Handling message of type: {}", type);
@@ -112,7 +112,7 @@ public class PMMessageHandler implements Runnable {
 	private void recover(){
 		try {
 			//Init input/output streams
-			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
+			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(new ObjectInputStream(socket.getInputStream()));
 			
 			//Read log message
 			JAXBContext jaxb_context = JAXBContext.newInstance(RecoverPMMessage.class);
@@ -122,7 +122,7 @@ public class PMMessageHandler implements Runnable {
 			Recovery.recover(pm_db, recover_msg);
 			
         	
-        	PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        	PrintWriter out = new PrintWriter(new ObjectOutputStream(socket.getOutputStream()), true);
         	out.println(MessageType.RECOVER);
             out.println("ACK");
             out.flush();
@@ -143,7 +143,7 @@ public class PMMessageHandler implements Runnable {
 	private void recoverDN(){
 		try {
 			//Init input/output streams
-			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(socket.getInputStream());
+			XMLEventReader xer = XMLInputFactory.newInstance().createXMLEventReader(new ObjectInputStream(socket.getInputStream()));
 			
 			//Read RecoverDNMessage message
 			JAXBContext jaxb_context = JAXBContext.newInstance(RecoverDNMessage.class);
@@ -199,14 +199,14 @@ public class PMMessageHandler implements Runnable {
             socket = new Socket(ip, port);
             
             //Init output streams
-            out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
+            out = new PrintWriter(new NoCloseOutputStream(new ObjectOutputStream(socket.getOutputStream())), true);
             
             //Send operation type
             out.println(MessageType.NEW_TABLE);
             out.flush();
             
             //Send RecoverTableMessage message
-            XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket.getOutputStream()); 
+            XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(new ObjectOutputStream(socket.getOutputStream())); 
             RecoverTableMessage recover_message = new RecoverTableMessage(table_name, reference_replica);
             JAXBContext jaxb_context = JAXBContext.newInstance(RecoverTableMessage.class);
 			Marshaller m = jaxb_context.createMarshaller();
@@ -239,7 +239,7 @@ public class PMMessageHandler implements Runnable {
 	 */
 	private void handleClientOperation(){
 		try{
-			NoCloseInputStream in = new NoCloseInputStream(socket.getInputStream());
+			NoCloseInputStream in = new NoCloseInputStream(new ObjectInputStream(socket.getInputStream()));
 			JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
 			ClientOPMsg msg = (ClientOPMsg) jaxb_context.createUnmarshaller().unmarshal(in);			
 			logger.debug("Message headers:\n{}\nMessage content:\n{}", msg.getHeaders(), msg.toString());
@@ -254,7 +254,7 @@ public class PMMessageHandler implements Runnable {
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			
 			//Sending the result
-			OutputStream out = socket.getOutputStream();
+			OutputStream out = new ObjectOutputStream(socket.getOutputStream());
 			m.marshal( result, out );
 			out.flush();
 			out.close();
@@ -419,7 +419,7 @@ public class PMMessageHandler implements Runnable {
 //            System.out.println("8");
             
             
-            ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             logger.info("Waiting for response");
 		    String str = (String) ois.readObject();
 		    StringReader reader = new StringReader(str);
@@ -474,8 +474,8 @@ public class PMMessageHandler implements Runnable {
  
         try {    
             socket = new Socket(pm_db.orch_ip, pm_db.orch_port);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(new ObjectOutputStream(socket.getOutputStream()), true);
+            in = new BufferedReader(new InputStreamReader(new ObjectInputStream(socket.getInputStream())));
 
             //Sending request
             out.println(MessageType.GET_TABLE_REPLICAS);
@@ -508,8 +508,8 @@ public class PMMessageHandler implements Runnable {
  
         try {    
             socket = new Socket(pm_db.orch_ip, pm_db.orch_port);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(new ObjectOutputStream(socket.getOutputStream()), true);
+            in = new BufferedReader(new InputStreamReader(new ObjectInputStream(socket.getInputStream())));
 
             //Sending request
             out.println(MessageType.FREE_REPLICAS);

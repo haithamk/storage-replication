@@ -1,6 +1,7 @@
 package orchestrator;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -272,8 +273,8 @@ public class NodesManager extends Thread {
             socket = new Socket(ip, port);
             
             //Init output streams
-            out = new PrintWriter(new NoCloseOutputStream(socket.getOutputStream()), true);
-            XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(socket.getOutputStream()); 
+            out = new PrintWriter(new NoCloseOutputStream(new ObjectOutputStream(socket.getOutputStream())), true);
+            XMLEventWriter xsw = XMLOutputFactory.newInstance().createXMLEventWriter(new ObjectOutputStream(socket.getOutputStream())); 
             
             //Send operation type
             out.println(MessageType.RECOVER);

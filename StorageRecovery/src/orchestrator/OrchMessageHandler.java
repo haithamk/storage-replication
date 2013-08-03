@@ -3,6 +3,8 @@ package orchestrator;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Collection;
@@ -31,7 +33,7 @@ public class OrchMessageHandler implements Runnable {
 	static final Logger logger = LoggerFactory.getLogger(OrchMessageHandler.class);
 	Socket socket;				//The received socket
 	OrchestratorDB orch_db;		//The data base of the Orchestrator
-	BufferedReader inputReader;
+	ObjectInputStream inputReader;
 	
 	public OrchMessageHandler(Socket socket, OrchestratorDB orch_db ){
 		logger.debug("New OrchMessageHandler created");
@@ -43,7 +45,7 @@ public class OrchMessageHandler implements Runnable {
 	public void run() {
 		try {
 			
-			inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			inputReader =  new ObjectInputStream(socket.getInputStream());
 			MessageType type = MessageType.valueOf(inputReader.readLine());
 			logger.info("Handling message of type: {}", type);
 			
@@ -124,14 +126,11 @@ public class OrchMessageHandler implements Runnable {
 			
 			//Sending message
 			logger.debug("Sending reply");
-			OutputStream out = socket.getOutputStream();
-			//PrintWriter pw = new PrintWriter(out, true);
-			//pw.println("PM_ADDRESS");
+			OutputStream out = new ObjectOutputStream(socket.getOutputStream());
 			 
 			m.marshal( reply, out );
 			out.flush();
 			out.close();
-			//socket.shutdownOutput();
 			socket.close();
 			logger.info("Handling request completed successfully");
 			
