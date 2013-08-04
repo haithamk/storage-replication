@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import utilities.NoCloseInputStream;
 import utilities.NoCloseOutputStream;
 import utilities.TCPUtility;
-
 import messages.ClientOPMsg;
 import messages.DataNodesAddresses;
 import messages.LogMessage;
@@ -58,7 +58,7 @@ public class PMMessageHandler implements Runnable {
 	static final Logger logger = LoggerFactory.getLogger(PMMessageHandler.class);
 	Socket socket;
 	PartitionManagerDB pm_db;
-	ObjectInputStream in;
+	//ObjectInputStream in;
 	
 	
 	
@@ -75,7 +75,7 @@ public class PMMessageHandler implements Runnable {
 	public void run() {
 		try {
 			
-			in = new ObjectInputStream(socket.getInputStream());
+			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			@SuppressWarnings("deprecation")
 			MessageType type = MessageType.valueOf(in.readLine());
 			logger.info("Handling message of type: {}", type);
@@ -237,17 +237,25 @@ public class PMMessageHandler implements Runnable {
 	
 	/**
 	 * Unmarshalls the Client request, executes it and returns a result to the user.
+	 * @throws ClassNotFoundException 
 	 */
-	private void handleClientOperation(){
+	private void handleClientOperation() throws ClassNotFoundException{
 		try{
+			
+			InputStream inputStream = socket.getInputStream();
+			ObjectInputStream ois = new ObjectInputStream(inputStream);
+		    String str = (String) ois.readObject();//readObject();
+		    StringReader reader = new StringReader(str);
+			
 		//	NoCloseInputStream in = new NoCloseInputStream(new ObjectInputStream(socket.getInputStream()));
 			JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
-			ClientOPMsg msg = (ClientOPMsg) jaxb_context.createUnmarshaller().unmarshal(in);			
+			ClientOPMsg msg = (ClientOPMsg) jaxb_context.createUnmarshaller().unmarshal(reader);			
 			logger.debug("Message headers:\n{}\nMessage content:\n{}", msg.getHeaders(), msg.toString());
 			//TODO check if the check sum is fine
 			//TODO check if the user is authorized
 			
-			ClientOPResult result = executeClientOperation(msg);
+			//ClientOPResult result = executeClientOperation(msg);
+			ClientOPResult result = new ClientOPResult();
 			
 			//Creating marshaler
 			jaxb_context = JAXBContext.newInstance(ClientOPResult.class);			
@@ -485,7 +493,7 @@ public class PMMessageHandler implements Runnable {
             result = (DataNodesAddresses) jaxb_context.createUnmarshaller().unmarshal(local_in);	
 
             out.close();
-            in.close();
+            local_in.close();
             socket.close();
         } catch (JAXBException e) {
         	logger.error("Error marshling/unmarshling", e);
