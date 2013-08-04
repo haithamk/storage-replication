@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -384,14 +385,23 @@ public class FrontEnd extends Component{
 	            out = new PrintWriter(new ObjectOutputStream(socket.getOutputStream()), true);
 	            System.out.println("Writing CLIENT_OPERATION output stream");	            
 	            out.println("CLIENT_OPERATION");
+	            
 	            JAXBContext jaxb_context = JAXBContext.newInstance(ClientOPMsg.class);
 				Marshaller m = jaxb_context.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				System.out.println("Writing Marshaled message output stream");
-				m.marshal( msg, out );
-				System.out.println("message written");
-				out.flush();
-				out.close();
+				
+				StringWriter str_writer = new StringWriter();
+				m.marshal(msg,str_writer);
+				ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+				oos.writeObject(str_writer.toString());
+				oos.flush();
+				
+				
+//				ObjectOutputStream out2 = new ObjectOutputStream(socket.getOutputStream());
+//				m.marshal( msg, out2 );
+//				System.out.println("message written");
+//				out2.flush();
 				System.out.println("Message flushed");
 				//socket.shutdownOutput(); //To send EOF
 				
