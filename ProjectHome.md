@@ -1,0 +1,1 @@
+Based on Windows Azure storage replication paper
